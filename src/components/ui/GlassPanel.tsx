@@ -13,7 +13,7 @@ export function GlassPanel({ className, hover = true, glow = false, children, ..
     <div
       className={cn(
         "glass-panel rounded-xl",
-        glow && "ai-glow border-primary/20",
+        glow && "border-accent/30",
         className
       )}
       {...props}

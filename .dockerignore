@@ -1,0 +1,27 @@
+# Dependencies & build output (rebuilt inside the image)
+node_modules
+.next
+out
+
+# Secrets — never bake env files into the image (set vars in Render/Vercel)
+.env
+.env.*
+
+# VCS & local tooling
+.git
+.gitignore
+*.log
+dev-server.log
+
+# Docs / local-only
+README.md
+design.md
+ONBOARDING.md
+DEPLOYMENT.md
+.vercel
+.vscode
+.idea
+
+# OS cruft
+.DS_Store
+Thumbs.db

@@ -68,12 +68,12 @@ export default function DeviceSetupPage({ params }: { params: Promise<{ id: stri
   const progressPercent = (currentStep / (steps.length - 1)) * 100;
 
   return (
-    <div className="bg-[#050816] text-[#d4e4fa] min-h-screen flex flex-col font-sans overflow-x-hidden">
+    <div className="bg-canvas text-ink min-h-screen flex flex-col font-sans overflow-x-hidden">
       {/* Header */}
-      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 md:px-12 h-16 bg-[#051424]/80 backdrop-blur-xl border-b border-white/10">
-        <div className="font-display text-xl font-bold text-[#adc6ff] tracking-tight">AIEval Pro</div>
+      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 md:px-12 h-16 bg-canvas/80 backdrop-blur-xl border-b border-line">
+        <div className="font-display text-xl font-bold text-accent tracking-tight">AIEval Pro</div>
         <div className="flex items-center gap-4">
-          <span className="font-mono text-[13px] text-[#c2c6d6]/60">Candidate Setup</span>
+          <span className="font-mono text-[13px] text-ink-mute">Candidate Setup</span>
         </div>
       </header>
 
@@ -82,10 +82,10 @@ export default function DeviceSetupPage({ params }: { params: Promise<{ id: stri
         <div className="w-full max-w-4xl mb-8">
           <div className="flex items-center justify-between relative">
             {/* Background line */}
-            <div className="absolute top-5 left-0 w-full h-[1px] bg-white/10 -z-10" />
+            <div className="absolute top-5 left-0 w-full h-[1px] bg-surface-2 -z-10" />
             {/* Active line */}
             <div
-              className="absolute top-5 left-0 h-[1px] bg-[#adc6ff] transition-all duration-500 -z-10"
+              className="absolute top-5 left-0 h-[1px] bg-accent transition-all duration-500 -z-10"
               style={{ width: `${progressPercent}%` }}
             />
             {steps.map((step, i) => {
@@ -96,10 +96,10 @@ export default function DeviceSetupPage({ params }: { params: Promise<{ id: stri
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
                       done
-                        ? "bg-[#4edea3]/20 border border-[#4edea3] text-[#4edea3]"
+                        ? "bg-success/20 border border-success text-success"
                         : active
-                        ? "bg-[#adc6ff] text-[#002e6a] ring-4 ring-[#adc6ff]/20"
-                        : "bg-[#1c2b3c] border border-white/10 text-[#c2c6d6]/40"
+                        ? "bg-accent text-on-accent ring-4 ring-accent/20"
+                        : "bg-surface-2 border border-line text-ink-mute"
                     }`}
                   >
                     <span className="material-symbols-outlined">
@@ -108,7 +108,7 @@ export default function DeviceSetupPage({ params }: { params: Promise<{ id: stri
                   </div>
                   <span
                     className={`font-mono text-[13px] ${
-                      done ? "text-[#4edea3]" : active ? "text-[#adc6ff]" : "text-[#c2c6d6]/40"
+                      done ? "text-success" : active ? "text-accent" : "text-ink-mute"
                     }`}
                   >
                     {step.label}
@@ -134,10 +134,10 @@ export default function DeviceSetupPage({ params }: { params: Promise<{ id: stri
                   className="w-full h-full object-cover grayscale-[0.3]"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-[#0d1c2d]">
+                <div className="w-full h-full flex items-center justify-center bg-surface">
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <span className="material-symbols-outlined text-[#adc6ff] text-6xl">hearing</span>
-                    <p className="font-sans text-[#c2c6d6] text-sm">Speaker Test</p>
+                    <span className="material-symbols-outlined text-accent text-6xl">hearing</span>
+                    <p className="font-sans text-ink-soft text-sm">Speaker Test</p>
                   </div>
                 </div>
               )}
@@ -145,33 +145,33 @@ export default function DeviceSetupPage({ params }: { params: Promise<{ id: stri
               {/* Face detection overlay (camera step) */}
               {stepKey === "camera" && (
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-64 face-outline pointer-events-none flex items-center justify-center">
-                  <div className="w-2 h-2 rounded-full bg-[#adc6ff] glow-pulse absolute top-10" />
+                  <div className="w-2 h-2 rounded-full bg-accent glow-pulse absolute top-10" />
                 </div>
               )}
 
               {/* HUD */}
               <div className="absolute top-4 left-4">
-                <div className="bg-[#051424]/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#4edea3] animate-pulse" />
-                  <span className="font-mono text-[11px] text-[#d4e4fa]">LIVE FEED</span>
+                <div className="bg-canvas/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-line flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                  <span className="font-mono text-[11px] text-ink">LIVE FEED</span>
                 </div>
               </div>
 
               {stepKey === "camera" && (
                 <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
-                  <div className="bg-[#051424]/60 backdrop-blur-md p-3 rounded-lg border border-white/10 flex flex-col gap-2 min-w-[140px]">
-                    <span className="font-mono text-[11px] text-[#c2c6d6]">LIGHTING QUALITY</span>
+                  <div className="bg-canvas/60 backdrop-blur-md p-3 rounded-lg border border-line flex flex-col gap-2 min-w-[140px]">
+                    <span className="font-mono text-[11px] text-ink-soft">LIGHTING QUALITY</span>
                     <div className="flex gap-1 h-1.5 w-full">
-                      <div className="flex-grow bg-[#4edea3] rounded-full" />
-                      <div className="flex-grow bg-[#4edea3] rounded-full" />
-                      <div className="flex-grow bg-[#4edea3] rounded-full" />
-                      <div className="flex-grow bg-white/10 rounded-full" />
+                      <div className="flex-grow bg-success rounded-full" />
+                      <div className="flex-grow bg-success rounded-full" />
+                      <div className="flex-grow bg-success rounded-full" />
+                      <div className="flex-grow bg-surface-2 rounded-full" />
                     </div>
-                    <span className="font-mono text-[11px] text-[#4edea3]">Optimal</span>
+                    <span className="font-mono text-[11px] text-success">Optimal</span>
                   </div>
-                  <div className="bg-[#051424]/60 backdrop-blur-md p-3 rounded-lg border border-white/10">
-                    <span className="font-mono text-[11px] text-[#c2c6d6] block mb-1">STABILITY</span>
-                    <span className="font-mono text-[13px] text-[#adc6ff]">98.4%</span>
+                  <div className="bg-canvas/60 backdrop-blur-md p-3 rounded-lg border border-line">
+                    <span className="font-mono text-[11px] text-ink-soft block mb-1">STABILITY</span>
+                    <span className="font-mono text-[13px] text-accent">98.4%</span>
                   </div>
                 </div>
               )}
@@ -180,13 +180,13 @@ export default function DeviceSetupPage({ params }: { params: Promise<{ id: stri
             {/* Mic visualizer (microphone step) */}
             {stepKey === "microphone" && (
               <div className="glass-panel p-4 rounded-xl flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#adc6ff]/10 flex items-center justify-center text-[#adc6ff] border border-[#adc6ff]/20">
+                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent border border-accent/20">
                   <span className="material-symbols-outlined material-filled">mic</span>
                 </div>
                 <div className="flex-grow">
                   <div className="flex justify-between items-end mb-2">
                     <span className="font-mono text-[13px]">Microphone Detection</span>
-                    <span className="font-mono text-[11px] text-[#4edea3] uppercase">
+                    <span className="font-mono text-[11px] text-success uppercase">
                       {micActive ? "Active" : "Inactive"}
                     </span>
                   </div>
@@ -194,7 +194,7 @@ export default function DeviceSetupPage({ params }: { params: Promise<{ id: stri
                     {waveformDelays.map((delay, i) => (
                       <div
                         key={i}
-                        className="w-1 bg-[#adc6ff] rounded-full waveform-bar"
+                        className="w-1 bg-accent rounded-full waveform-bar"
                         style={{ animationDelay: `${delay}s`, height: "60%" }}
                       />
                     ))}
@@ -208,17 +208,17 @@ export default function DeviceSetupPage({ params }: { params: Promise<{ id: stri
           <div className="lg:col-span-5 flex flex-col gap-4">
             <div className="glass-panel p-8 rounded-xl flex flex-col gap-4 h-full">
               <div className="flex flex-col gap-2">
-                <h2 className="font-display text-xl font-medium text-[#d4e4fa]">Audio &amp; Video Setup</h2>
-                <p className="font-sans text-base text-[#c2c6d6]/80">
+                <h2 className="font-display text-xl font-medium text-ink">Audio &amp; Video Setup</h2>
+                <p className="font-sans text-base text-ink-mute">
                   Ensure your hardware is correctly configured for the proctored interview environment.
                 </p>
               </div>
-              <div className="h-[1px] bg-white/5 w-full" />
+              <div className="h-[1px] bg-surface-2 w-full" />
 
               {/* Device selectors */}
               {(stepKey === "camera" || stepKey === "microphone") && (
                 <div className="flex flex-col gap-3">
-                  <label className="font-mono text-[13px] text-[#c2c6d6] px-1">Hardware Setup</label>
+                  <label className="font-mono text-[13px] text-ink-soft px-1">Hardware Setup</label>
                   {[
                     { icon: "videocam", label: "FaceTime HD Camera" },
                     { icon: "mic", label: "Built-in Microphone" },
@@ -226,11 +226,11 @@ export default function DeviceSetupPage({ params }: { params: Promise<{ id: stri
                   ].map((device) => (
                     <div
                       key={device.label}
-                      className="flex items-center gap-2 px-3 py-2.5 glass-panel rounded-lg cursor-pointer hover:border-[#adc6ff]/40 transition-colors"
+                      className="flex items-center gap-2 px-3 py-2.5 glass-panel rounded-lg cursor-pointer hover:border-accent/40 transition-colors"
                     >
-                      <span className="material-symbols-outlined text-[#adc6ff] text-[20px]">{device.icon}</span>
+                      <span className="material-symbols-outlined text-accent text-[20px]">{device.icon}</span>
                       <span className="font-sans text-sm flex-1 truncate">{device.label}</span>
-                      <span className="material-symbols-outlined text-[#c2c6d6] text-[18px]">expand_more</span>
+                      <span className="material-symbols-outlined text-ink-soft text-[18px]">expand_more</span>
                     </div>
                   ))}
                 </div>
@@ -240,30 +240,30 @@ export default function DeviceSetupPage({ params }: { params: Promise<{ id: stri
               {stepKey === "speaker" && (
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-[#adc6ff]">hearing</span>
-                    <h3 className="font-mono text-[13px] text-[#d4e4fa] uppercase tracking-wider">Speaker Test</h3>
+                    <span className="material-symbols-outlined text-accent">hearing</span>
+                    <h3 className="font-mono text-[13px] text-ink uppercase tracking-wider">Speaker Test</h3>
                   </div>
-                  <div className="bg-[#0d1c2d] border border-white/5 p-4 rounded-lg flex flex-col gap-4">
-                    <p className="font-sans text-sm text-[#c2c6d6]">
+                  <div className="bg-surface border border-line p-4 rounded-lg flex flex-col gap-4">
+                    <p className="font-sans text-sm text-ink-soft">
                       Click the button below to play a short chime. Confirm you can hear it clearly.
                     </p>
                     <button
                       onClick={playTestAudio}
                       disabled={isPlayingAudio}
-                      className="group flex items-center justify-center gap-3 py-3 px-6 bg-[#273647] hover:bg-[#2c3a4c] border border-white/10 rounded-lg transition-all duration-200"
+                      className="group flex items-center justify-center gap-3 py-3 px-6 bg-surface-2 hover:bg-surface-2-hover border border-line rounded-lg transition-all duration-200"
                     >
-                      <span className="material-symbols-outlined text-[#adc6ff] group-active:scale-90 transition-transform">
+                      <span className="material-symbols-outlined text-accent group-active:scale-90 transition-transform">
                         {isPlayingAudio ? "graphic_eq" : "play_circle"}
                       </span>
-                      <span className="font-mono text-[13px] text-[#d4e4fa]">
+                      <span className="font-mono text-[13px] text-ink">
                         {isPlayingAudio ? "Playing..." : "Play Sample Audio"}
                       </span>
                     </button>
                     <label className="flex items-center gap-3 cursor-pointer group" onClick={() => setSpeakerConfirmed(!speakerConfirmed)}>
-                      <div className="w-5 h-5 rounded border border-white/20 flex items-center justify-center transition-colors" style={{ borderColor: speakerConfirmed ? "#adc6ff" : undefined }}>
-                        {speakerConfirmed && <span className="material-symbols-outlined text-[#adc6ff] text-xs">check</span>}
+                      <div className="w-5 h-5 rounded border border-line flex items-center justify-center transition-colors" style={{ borderColor: speakerConfirmed ? "var(--accent)" : undefined }}>
+                        {speakerConfirmed && <span className="material-symbols-outlined text-accent text-xs">check</span>}
                       </div>
-                      <span className="font-sans text-base text-[#d4e4fa] group-hover:text-[#adc6ff] transition-colors">
+                      <span className="font-sans text-base text-ink group-hover:text-accent transition-colors">
                         I heard the sound clearly
                       </span>
                     </label>
@@ -272,9 +272,9 @@ export default function DeviceSetupPage({ params }: { params: Promise<{ id: stri
               )}
 
               <div className="mt-auto flex flex-col gap-4">
-                <div className="bg-[#adc6ff]/5 border border-[#adc6ff]/20 p-4 rounded-lg flex gap-3">
-                  <span className="material-symbols-outlined text-[#adc6ff] text-xl">info</span>
-                  <p className="font-sans text-sm text-[#c2c6d6]/90 leading-relaxed">
+                <div className="bg-accent/5 border border-accent/20 p-4 rounded-lg flex gap-3">
+                  <span className="material-symbols-outlined text-accent text-xl">info</span>
+                  <p className="font-sans text-sm text-ink-mute leading-relaxed">
                     AI-driven proctoring requires a stable 2Mbps connection. Face must remain within the detection outline at all times.
                   </p>
                 </div>
@@ -285,20 +285,20 @@ export default function DeviceSetupPage({ params }: { params: Promise<{ id: stri
       </main>
 
       {/* Footer nav */}
-      <footer className="fixed bottom-0 left-0 w-full z-50 px-6 md:px-12 py-4 bg-[#051424]/60 backdrop-blur-2xl border-t border-white/10">
+      <footer className="fixed bottom-0 left-0 w-full z-50 px-6 md:px-12 py-4 bg-canvas/60 backdrop-blur-2xl border-t border-line">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <button
             onClick={() => currentStep > 0 ? setCurrentStep((s) => s - 1) : router.back()}
-            className="px-8 py-3 rounded-lg border border-white/10 text-[#c2c6d6] font-mono text-[13px] hover:bg-white/5 transition-all active:scale-95"
+            className="px-8 py-3 rounded-lg border border-line text-ink-soft font-mono text-[13px] hover:bg-surface-2-hover transition-all active:scale-95"
           >
             Back
           </button>
           <div className="flex items-center gap-4">
-            <span className="hidden md:block font-mono text-[11px] text-[#c2c6d6]/40">Ready to proceed to assessment</span>
+            <span className="hidden md:block font-mono text-[11px] text-ink-mute">Ready to proceed to assessment</span>
             <button
               onClick={goNext}
               disabled={stepKey === "speaker" && !speakerConfirmed}
-              className="px-10 py-3 rounded-lg bg-[#adc6ff] text-[#002e6a] font-mono text-[13px] font-bold shadow-lg shadow-[#adc6ff]/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-10 py-3 rounded-lg bg-accent text-on-accent font-mono text-[13px] font-bold shadow-lg hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Continue
             </button>

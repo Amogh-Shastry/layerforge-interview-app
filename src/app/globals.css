@@ -1,58 +1,238 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #051424;
-  --foreground: #d4e4fa;
+/* ============================================================
+   LayerForge design tokens — see design.md
+   Components reference semantic tokens; values flip per theme.
+   ============================================================ */
+@theme inline {
+  /* --- LayerForge semantic colour tokens --- */
+  --color-canvas: var(--bg);
+  --color-surface: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-hover: var(--surface-1-hover);
+  --color-surface-2-hover: var(--surface-2-hover);
+  --color-chrome: var(--chrome);
+  --color-on-chrome: var(--on-chrome);
+  --color-ink: var(--text-primary);
+  --color-ink-soft: var(--text-secondary);
+  --color-ink-mute: var(--text-muted);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-press: var(--accent-press);
+  --color-on-accent: var(--on-accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  /* --- Brand palette (literal, theme-stable) --- */
+  --color-teal: #033b55;
+  --color-steel: #2c3e50;
+  --color-offwhite: #f5f4f0;
+  --color-slate: #8fa3b1;
+  --color-blaze: #f86400;
+
+  /* --- Legacy MD3 token aliases → remapped onto LayerForge --- */
+  --color-background: var(--bg);
+  --color-surface-dim: var(--bg);
+  --color-surface-container-lowest: var(--bg);
+  --color-surface-container-low: var(--surface-1);
+  --color-surface-container: var(--surface-1);
+  --color-surface-container-high: var(--surface-2);
+  --color-surface-container-highest: var(--surface-2);
+  --color-surface-variant: var(--surface-2);
+  --color-surface-bright: var(--surface-2);
+  --color-on-surface: var(--text-primary);
+  --color-on-background: var(--text-primary);
+  --color-on-surface-variant: var(--text-secondary);
+  --color-outline: var(--text-muted);
+  --color-outline-variant: var(--border);
+  --color-primary: var(--accent);
+  --color-primary-container: var(--accent);
+  --color-primary-fixed: var(--accent);
+  --color-primary-fixed-dim: var(--accent);
+  --color-secondary: var(--accent);
+  --color-on-primary: var(--on-accent);
+  --color-on-primary-container: var(--on-accent);
+  --color-inverse-primary: var(--accent);
+  --color-surface-tint: var(--accent);
+  --color-tertiary: var(--success);
+  --color-tertiary-fixed: var(--success);
+  --color-tertiary-fixed-dim: var(--success);
+  --color-tertiary-container: var(--success);
+  --color-error: var(--danger);
+  --color-error-container: var(--danger);
+  --color-on-error: var(--on-accent);
+
+  /* --- Typography --- */
+  --font-sans: "Outfit", sans-serif;
+  --font-display: "Urbanist", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-headline-lg: "Urbanist", sans-serif;
+  --font-headline-md: "Urbanist", sans-serif;
+  --font-display-lg: "Urbanist", sans-serif;
+  --font-body-sm: "Outfit", sans-serif;
+  --font-body-md: "Outfit", sans-serif;
+  --font-body-lg: "Outfit", sans-serif;
+  --font-label-sm: "JetBrains Mono", monospace;
+  --font-label-md: "JetBrains Mono", monospace;
+
+  --text-display-lg: 48px;
+  --text-display-lg--line-height: 1.1;
+  --text-display-lg--letter-spacing: -0.04em;
+  --text-display-lg--font-weight: 700;
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 1.2;
+  --text-headline-lg--letter-spacing: -0.02em;
+  --text-headline-lg--font-weight: 600;
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 1.3;
+  --text-headline-md--font-weight: 600;
+  --text-headline-lg-mobile: 24px;
+  --text-headline-lg-mobile--line-height: 1.2;
+  --text-headline-lg-mobile--font-weight: 600;
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 1.6;
+  --text-body-lg--font-weight: 400;
+  --text-body-md: 16px;
+  --text-body-md--line-height: 1.5;
+  --text-body-md--font-weight: 400;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 1.5;
+  --text-body-sm--font-weight: 400;
+  --text-label-md: 13px;
+  --text-label-md--line-height: 1;
+  --text-label-md--letter-spacing: 0.02em;
+  --text-label-md--font-weight: 500;
+  --text-label-sm: 11px;
+  --text-label-sm--line-height: 1;
+  --text-label-sm--letter-spacing: 0.05em;
+  --text-label-sm--font-weight: 500;
+
+  /* --- Radius (kept tight = precise) --- */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
 }
 
-html {
+/* ============================================================
+   Theme definitions — DARK is the default (:root)
+   ============================================================ */
+:root {
   color-scheme: dark;
+
+  --bg: #051424;
+  --surface-1: #033b55;
+  --surface-2: #2c3e50;
+  --surface-1-hover: #0a4a68;
+  --surface-2-hover: #38516b;
+  --chrome: #033b55;
+  --on-chrome: #f5f4f0;
+
+  --text-primary: #f5f4f0;
+  --text-secondary: #c3cdd6;
+  --text-muted: #8fa3b1;
+
+  --border: rgba(143, 163, 177, 0.18);
+  --border-strong: rgba(143, 163, 177, 0.32);
+
+  --accent: #f86400;
+  --accent-hover: #ff7a1f;
+  --accent-press: #d85600;
+  --on-accent: #051424;
+
+  --success: #2fbf8f;
+  --warning: #f5a623;
+  --danger: #e5484d;
+
+  /* surfaces / effects */
+  --glass-bg: rgba(3, 59, 85, 0.55);
+  --glass-border: rgba(143, 163, 177, 0.18);
+  --selection-bg: rgba(248, 100, 0, 0.25);
+  --scrollbar-thumb: rgba(143, 163, 177, 0.4);
+
+  --background: #051424;
+  --foreground: #f5f4f0;
+}
+
+:root.light,
+.light {
+  color-scheme: light;
+
+  --bg: #f5f4f0;
+  --surface-1: #ffffff;
+  --surface-2: #eceae3;
+  --surface-1-hover: #f3f2ee;
+  --surface-2-hover: #e3e1d9;
+  --chrome: #033b55; /* teal chrome in both themes */
+  --on-chrome: #f5f4f0;
+
+  --text-primary: #16222e;
+  --text-secondary: #2c3e50;
+  --text-muted: #5e7081;
+
+  --border: rgba(44, 62, 80, 0.14);
+  --border-strong: rgba(44, 62, 80, 0.26);
+
+  --accent: #f86400;
+  --accent-hover: #ff7a1f;
+  --accent-press: #d85600;
+  --on-accent: #051424;
+
+  --success: #1f9d72;
+  --warning: #c97a05;
+  --danger: #c8353a;
+
+  --glass-bg: rgba(255, 255, 255, 0.62);
+  --glass-border: rgba(44, 62, 80, 0.12);
+  --selection-bg: rgba(248, 100, 0, 0.22);
+  --scrollbar-thumb: rgba(44, 62, 80, 0.28);
+
+  --background: #f5f4f0;
+  --foreground: #16222e;
 }
 
 body {
-  background-color: #051424;
-  color: #d4e4fa;
-  font-family: 'Inter', sans-serif;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: "Outfit", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 ::selection {
-  background-color: rgba(173, 198, 255, 0.3);
+  background-color: var(--selection-bg);
 }
 
-/* Glassmorphism panel */
-.glass-panel {
-  background: rgba(18, 33, 49, 0.7);
+/* Glassmorphism panel — teal-tinted, lighter blur, less glow */
+.glass-panel,
+.glass-card {
+  background: var(--glass-bg);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top-color: rgba(255, 255, 255, 0.15);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
 }
 
 .glass-panel:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.glass-card {
-  backdrop-filter: blur(12px);
-  background: rgba(18, 33, 49, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top-color: rgba(255, 255, 255, 0.15);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  border-color: var(--border-strong);
 }
 
 /* Status chip */
 .status-chip {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   text-transform: uppercase;
   font-size: 10px;
   letter-spacing: 0.05em;
   font-weight: 500;
 }
 
-/* Waveform animation */
+/* Waveform animation (kept — functional) */
 .waveform-bar {
   animation: waveform 1.2s ease-in-out infinite;
 }
@@ -70,43 +250,33 @@ body {
   background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--scrollbar-thumb);
   border-radius: 10px;
 }
 
-/* Face detection outline */
+/* Face detection outline — slate, accent when locked-on */
 .face-outline {
-  border: 2px solid rgba(173, 198, 255, 0.5);
+  border: 2px solid var(--text-muted);
   border-radius: 40% 40% 45% 45%;
 }
+.face-outline.locked {
+  border-color: var(--accent);
+}
 
-/* Transcript gradient mask */
+/* Transcript gradient mask (kept — functional) */
 .transcript-gradient {
   mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
 }
 
-/* Active speaker ring */
+/* Active speaker ring — crisp accent ring, no blur */
 .active-speaker-ring {
-  box-shadow: 0 0 0 3px rgba(173, 198, 255, 0.4);
+  box-shadow: 0 0 0 2px var(--accent);
 }
 
-/* AI glow */
-.ai-glow {
-  position: relative;
-}
-.ai-glow::after {
-  content: '';
-  position: absolute;
-  inset: -20px;
-  background: radial-gradient(64px circle at center, rgba(59, 130, 246, 0.1), transparent);
-  z-index: -1;
-  pointer-events: none;
-}
-
-/* Progress line */
+/* Progress line — accent fill, no glow */
 .progress-line {
   height: 4px;
-  background: rgba(173, 198, 255, 0.1);
+  background: var(--border);
   position: relative;
   overflow: hidden;
   border-radius: 2px;
@@ -114,62 +284,17 @@ body {
 
 .progress-fill {
   height: 100%;
-  background: #adc6ff;
+  background: var(--accent);
   transition: width 2s ease-in-out;
-  box-shadow: 0 0 15px rgba(173, 198, 255, 0.5);
 }
 
-/* Glow pulse */
-@keyframes glow-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.1; }
-  50% { transform: scale(1.15); opacity: 0.25; }
+/* Recording pulse — the one allowed subtle ambient pulse */
+@keyframes rec-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
 }
-
-.ai-glow-pulse {
-  animation: glow-pulse 3s ease-in-out infinite;
-}
-
-/* Pulse ring */
-@keyframes pulse-ring {
-  0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
-  50% { opacity: 0.5; }
-  100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
-}
-
-.pulse-ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 2px solid #adc6ff;
-  border-radius: 50%;
-  animation: pulse-ring 3s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-}
-
-/* Breathe animation */
-@keyframes breathe {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.05); opacity: 1; }
-}
-
-.brain-glow {
-  filter: drop-shadow(0 0 20px rgba(173, 198, 255, 0.4));
-  animation: breathe 4s ease-in-out infinite;
-}
-
-/* Scanline */
-.scanline-effect {
-  position: absolute;
-  width: 100%;
-  height: 100px;
-  background: linear-gradient(to bottom, transparent, rgba(173, 198, 255, 0.05), transparent);
-  top: -100px;
-  animation: scan 4s linear infinite;
-}
-
-@keyframes scan {
-  0% { top: -100px; }
-  100% { top: 100vh; }
+.rec-pulse {
+  animation: rec-pulse 1.6s ease-in-out infinite;
 }
 
 /* Material Symbols */
@@ -191,7 +316,7 @@ body {
   font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-/* Active pulse */
+/* Active pulse (kept for live-state dots) */
 @keyframes active-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.7; transform: scale(1.05); }
@@ -199,14 +324,4 @@ body {
 
 .active-pulse {
   animation: active-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Animate breathing */
-@keyframes ai-breathing {
-  0%, 100% { transform: scale(0.95); opacity: 0.5; }
-  50% { transform: scale(1.05); opacity: 0.8; }
-}
-
-.animate-ai-pulse {
-  animation: ai-breathing 3s ease-in-out infinite;
 }

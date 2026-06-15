@@ -2,8 +2,11 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 
+# Install ALL deps (incl. devDependencies) — next build needs TypeScript,
+# Tailwind, tsx, and the Prisma CLI. The final image stays small because the
+# runner stage only copies the traced standalone output.
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 
 # ─── Stage 2: builder ─────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder

@@ -8,22 +8,22 @@ const configs: Record<Recommendation, { label: string; icon: string; className: 
   "strong-hire": {
     label: "Strong Hire",
     icon: "star",
-    className: "bg-tertiary/10 border border-tertiary/20 text-tertiary",
+    className: "bg-success/10 border border-success/20 text-success",
   },
   hire: {
     label: "Hire",
     icon: "thumb_up",
-    className: "bg-primary/10 border border-primary/20 text-primary",
+    className: "bg-accent/10 border border-accent/20 text-accent",
   },
   borderline: {
     label: "Borderline",
     icon: "help",
-    className: "bg-[#f59e0b]/10 border border-[#f59e0b]/20 text-[#f59e0b]",
+    className: "bg-warning/10 border border-warning/20 text-warning",
   },
   "no-hire": {
     label: "No Hire",
     icon: "thumb_down",
-    className: "bg-error/10 border border-error/20 text-error",
+    className: "bg-danger/10 border border-danger/20 text-danger",
   },
 };
 
@@ -49,18 +49,18 @@ interface ScoreBadgeProps {
 
 export function ScoreBadge({ score, className }: ScoreBadgeProps) {
   const color =
-    score >= 80 ? "text-tertiary" :
-    score >= 60 ? "text-primary" :
-    "text-error";
+    score >= 80 ? "text-success" :
+    score >= 60 ? "text-ink-soft" :
+    "text-danger";
 
   const barColor =
-    score >= 80 ? "bg-tertiary" :
-    score >= 60 ? "bg-primary" :
-    "bg-error";
+    score >= 80 ? "bg-success" :
+    score >= 60 ? "bg-ink-soft" :
+    "bg-danger";
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <div className="h-1.5 w-16 bg-white/10 rounded-full overflow-hidden">
+      <div className="h-1.5 w-16 bg-line rounded-full overflow-hidden">
         <div className={cn("h-full rounded-full", barColor)} style={{ width: `${score}%` }} />
       </div>
       <span className={cn("font-label-sm text-label-sm", color)}>{score}%</span>

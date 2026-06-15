@@ -1,0 +1,34 @@
+# Render Blueprint — deploys the app as a Node web service.
+# In Render: New → Blueprint → connect this repo. Then fill in the env vars
+# marked `sync: false` (secrets) in the dashboard.
+#
+# Note: `runtime: node` below tells Render to use Node and IGNORE the Dockerfile.
+# (A Dockerfile in the repo root would otherwise make Render default to Docker.)
+services:
+  - type: web
+    name: layerforge-interview
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      # Neon Postgres pooled connection string (?sslmode=require)
+      - key: DATABASE_URL
+        sync: false
+      # OpenAI API key
+      - key: OPENAI_API_KEY
+        sync: false
+      # Session-cookie signing secret — Render generates a strong random value
+      - key: AUTH_SECRET
+        generateValue: true
+      # HR dashboard login
+      - key: HR_USERNAME
+        sync: false
+      - key: HR_PASSWORD
+        sync: false
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "20"

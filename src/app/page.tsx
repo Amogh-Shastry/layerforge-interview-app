@@ -1,39 +1,112 @@
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Logo } from "@/components/ui/Logo";
 
 export default function Home() {
+  const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (loading) return;
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Login failed");
+        setLoading(false);
+        return;
+      }
+      const next = new URLSearchParams(window.location.search).get("next");
+      router.push(next && next.startsWith("/dashboard") ? next : "/dashboard");
+    } catch {
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    }
+  }
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6">
       {/* Atmospheric background */}
       <div className="fixed inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-[#adc6ff]/5 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[#0267b8]/5 rounded-full blur-[100px]" />
+        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-accent/5 rounded-full blur-[100px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-accent/5 rounded-full blur-[100px]" />
       </div>
 
-      <div className="glass-panel rounded-xl p-8 max-w-lg w-full text-center space-y-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#adc6ff]/10 border border-[#adc6ff]/20 rounded-full">
-          <span className="w-2 h-2 bg-[#adc6ff] rounded-full active-pulse" />
-          <span className="font-mono text-[11px] text-[#adc6ff] uppercase tracking-widest">Platform Online</span>
+      <div className="glass-panel rounded-xl p-8 max-w-md w-full space-y-6">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <Logo variant="mono" tagline />
+          <div>
+            <h1 className="font-display text-2xl font-bold text-ink tracking-tight">HR Sign In</h1>
+            <p className="text-ink-mute text-sm mt-1">Sign in to access the hiring dashboard</p>
+          </div>
         </div>
-        <h1 className="font-display text-4xl font-bold text-[#d4e4fa] tracking-tight">AIEval Pro</h1>
-        <p className="text-[#c2c6d6]/80 text-base leading-relaxed">
-          Enterprise AI Interview Automation Platform by DeepStation
-        </p>
-        <div className="flex flex-col gap-3">
-          <Link
-            href="/interview/start/pos-senior-python"
-            className="w-full py-3 bg-[#adc6ff] text-[#002e6a] font-mono font-bold rounded-lg hover:brightness-110 transition-all flex items-center justify-center gap-2"
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <label htmlFor="username" className="font-mono text-[11px] uppercase tracking-widest text-ink-mute">
+              Username
+            </label>
+            <input
+              id="username"
+              type="text"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-surface-2 border border-line rounded-lg text-ink text-sm placeholder:text-ink-mute focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors"
+              placeholder="Enter your username"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="password" className="font-mono text-[11px] uppercase tracking-widest text-ink-mute">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-surface-2 border border-line rounded-lg text-ink text-sm placeholder:text-ink-mute focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors"
+              placeholder="Enter your password"
+            />
+          </div>
+
+          {error && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-danger/10 border border-danger/20 rounded-lg">
+              <span className="material-symbols-outlined text-danger text-[18px]">error</span>
+              <span className="text-danger text-sm">{error}</span>
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 bg-accent text-on-accent font-mono font-bold rounded-lg hover:bg-accent-hover active:bg-accent-press transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <span className="material-symbols-outlined text-lg">person_search</span>
-            Candidate Interview Demo
-          </Link>
-          <Link
-            href="/dashboard"
-            className="w-full py-3 border border-white/10 hover:bg-white/5 text-[#d4e4fa] font-mono text-sm rounded-lg transition-all flex items-center justify-center gap-2"
-          >
-            <span className="material-symbols-outlined text-lg">dashboard</span>
-            HR Dashboard
-          </Link>
-        </div>
+            {loading ? (
+              <span className="material-symbols-outlined text-lg animate-spin">progress_activity</span>
+            ) : (
+              <span className="material-symbols-outlined text-lg">login</span>
+            )}
+            {loading ? "Signing in…" : "Sign In"}
+          </button>
+        </form>
+
         <div className="flex items-center justify-center gap-4 opacity-40">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">lock</span>

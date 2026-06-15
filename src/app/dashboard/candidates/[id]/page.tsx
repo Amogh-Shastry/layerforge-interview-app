@@ -61,10 +61,10 @@ function recToSlug(rec: string | undefined): RecSlug {
   }
 }
 function scoreColor(s: number) {
-  return s >= 80 ? "text-[#4edea3]" : s >= 60 ? "text-[#adc6ff]" : "text-[#ffb4ab]";
+  return s >= 80 ? "text-success" : s >= 60 ? "text-accent" : "text-danger";
 }
 function barColor(s: number) {
-  return s >= 80 ? "bg-[#4edea3]" : s >= 60 ? "bg-[#adc6ff]" : "bg-[#ffb4ab]";
+  return s >= 80 ? "bg-success" : s >= 60 ? "bg-accent" : "bg-danger";
 }
 
 export default function HRCandidateReportPage({ params }: { params: Promise<{ id: string }> }) {
@@ -117,20 +117,20 @@ export default function HRCandidateReportPage({ params }: { params: Promise<{ id
       : [];
 
   return (
-    <div className="bg-[#051424] text-[#d4e4fa] min-h-screen custom-scrollbar">
-      <header className="sticky top-0 z-50 flex justify-between items-center px-6 md:px-12 h-16 bg-[#051424]/80 backdrop-blur-xl border-b border-white/10">
+    <div className="bg-canvas text-ink min-h-screen custom-scrollbar">
+      <header className="sticky top-0 z-50 flex justify-between items-center px-6 md:px-12 h-16 bg-canvas/80 backdrop-blur-xl border-b border-line">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="text-[#c2c6d6] hover:text-[#adc6ff] transition-colors">
+          <Link href="/dashboard" className="text-ink-soft hover:text-accent transition-colors">
             <span className="material-symbols-outlined">arrow_back</span>
           </Link>
-          <span className="font-display text-xl font-bold text-[#adc6ff] tracking-tight">AIEval Pro</span>
+          <span className="font-display text-xl font-bold text-accent tracking-tight">AIEval Pro</span>
         </div>
         <div className="flex items-center gap-3">
-          <button className="px-4 py-2 border border-white/10 rounded-lg font-mono text-[13px] hover:bg-white/5 transition-all flex items-center gap-2">
+          <button className="px-4 py-2 border border-line rounded-lg font-mono text-[13px] hover:bg-surface-2-hover transition-all flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">email</span>
             Send to HR
           </button>
-          <button className="px-4 py-2 bg-[#adc6ff] text-[#002e6a] rounded-lg font-mono text-[13px] font-bold hover:brightness-110 transition-all flex items-center gap-2">
+          <button className="px-4 py-2 bg-accent text-on-accent rounded-lg font-mono text-[13px] font-bold hover:bg-accent-hover hover:brightness-110 transition-all flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">download</span>
             Download PDF
           </button>
@@ -139,14 +139,14 @@ export default function HRCandidateReportPage({ params }: { params: Promise<{ id
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-32 gap-4">
-          <span className="material-symbols-outlined text-[#adc6ff] text-4xl animate-spin">progress_activity</span>
-          <p className="font-mono text-sm text-[#c2c6d6]/60">Loading candidate report…</p>
+          <span className="material-symbols-outlined text-accent text-4xl animate-spin">progress_activity</span>
+          <p className="font-mono text-sm text-ink-mute">Loading candidate report…</p>
         </div>
       ) : !candidate || !e ? (
         <div className="flex flex-col items-center justify-center py-32 gap-4 text-center px-4">
-          <span className="material-symbols-outlined text-[#c2c6d6]/40 text-5xl">person_off</span>
-          <p className="font-display text-xl text-[#d4e4fa]">Candidate not found</p>
-          <Link href="/dashboard" className="mt-2 px-6 py-3 bg-[#adc6ff] text-[#002e6a] font-mono text-[13px] rounded-lg">
+          <span className="material-symbols-outlined text-ink-mute text-5xl">person_off</span>
+          <p className="font-display text-xl text-ink">Candidate not found</p>
+          <Link href="/dashboard" className="mt-2 px-6 py-3 bg-accent text-on-accent font-mono text-[13px] rounded-lg">
             Back to Dashboard
           </Link>
         </div>
@@ -154,21 +154,21 @@ export default function HRCandidateReportPage({ params }: { params: Promise<{ id
         <main className="px-4 md:px-12 py-8 max-w-6xl mx-auto space-y-8">
           {/* Hero */}
           <div className="glass-panel rounded-xl p-6 flex flex-col md:flex-row gap-6 items-start md:items-center">
-            <div className="w-20 h-20 rounded-full bg-[#adc6ff]/10 border-2 border-[#adc6ff]/30 flex items-center justify-center text-[#adc6ff] font-display text-2xl font-bold">
+            <div className="w-20 h-20 rounded-full bg-accent/10 border-2 border-accent/30 flex items-center justify-center text-accent font-display text-2xl font-bold">
               {candidate.initials}
             </div>
             <div className="flex-1">
-              <h1 className="font-display text-3xl font-semibold text-[#d4e4fa]">{candidate.name}</h1>
+              <h1 className="font-display text-3xl font-semibold text-ink">{candidate.name}</h1>
               <div className="flex flex-wrap gap-3 mt-2">
-                <span className="font-mono text-[13px] text-[#c2c6d6]/70 flex items-center gap-1">
+                <span className="font-mono text-[13px] text-ink-mute flex items-center gap-1">
                   <span className="material-symbols-outlined text-sm">work</span>
                   {candidate.role}
                 </span>
-                <span className="font-mono text-[13px] text-[#c2c6d6]/70 flex items-center gap-1">
+                <span className="font-mono text-[13px] text-ink-mute flex items-center gap-1">
                   <span className="material-symbols-outlined text-sm">schedule</span>
                   {candidate.completedDate} · {candidate.durationMin} min
                 </span>
-                <span className="font-mono text-[13px] text-[#c2c6d6]/70 flex items-center gap-1">
+                <span className="font-mono text-[13px] text-ink-mute flex items-center gap-1">
                   <span className="material-symbols-outlined text-sm">badge</span>
                   {candidate.status}
                 </span>
@@ -184,34 +184,34 @@ export default function HRCandidateReportPage({ params }: { params: Promise<{ id
           {/* Candidate background (captured during intake) */}
           {e.candidateBackground && (
             <div className="glass-panel rounded-xl p-6">
-              <h2 className="font-display text-xl font-medium text-[#d4e4fa] mb-3 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#adc6ff]">badge</span>
+              <h2 className="font-display text-xl font-medium text-ink mb-3 flex items-center gap-2">
+                <span className="material-symbols-outlined text-accent">badge</span>
                 Candidate Background
               </h2>
-              <p className="font-sans text-sm text-[#c2c6d6] leading-relaxed">{e.candidateBackground}</p>
+              <p className="font-sans text-sm text-ink-soft leading-relaxed">{e.candidateBackground}</p>
             </div>
           )}
 
           {/* Summary */}
           {e.summary && (
             <div className="glass-panel rounded-xl p-6">
-              <h2 className="font-display text-xl font-medium text-[#d4e4fa] mb-3 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#adc6ff]">summarize</span>
+              <h2 className="font-display text-xl font-medium text-ink mb-3 flex items-center gap-2">
+                <span className="material-symbols-outlined text-accent">summarize</span>
                 Executive Summary
               </h2>
-              <p className="font-sans text-sm text-[#c2c6d6] leading-relaxed">{e.summary}</p>
+              <p className="font-sans text-sm text-ink-soft leading-relaxed">{e.summary}</p>
             </div>
           )}
 
           {/* Scores + technical analysis */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="glass-panel rounded-xl p-6">
-              <h2 className="font-display text-xl font-medium text-[#d4e4fa] mb-6">Competency Scores</h2>
+              <h2 className="font-display text-xl font-medium text-ink mb-6">Competency Scores</h2>
               <div className="space-y-4">
                 {competencies.map((item) => (
                   <div key={item.label} className="flex items-center gap-4">
-                    <span className="font-mono text-[13px] text-[#c2c6d6] w-36 flex-shrink-0">{item.label}</span>
-                    <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                    <span className="font-mono text-[13px] text-ink-soft w-36 flex-shrink-0">{item.label}</span>
+                    <div className="flex-1 h-2 bg-surface-2 rounded-full overflow-hidden">
                       <div className={`h-full ${barColor(item.score)} rounded-full`} style={{ width: `${item.score}%` }} />
                     </div>
                     <span className={`font-mono text-[13px] w-10 text-right ${scoreColor(item.score)}`}>{item.score}%</span>
@@ -221,21 +221,21 @@ export default function HRCandidateReportPage({ params }: { params: Promise<{ id
             </div>
 
             <div className="glass-panel rounded-xl p-6">
-              <h2 className="font-display text-xl font-medium text-[#d4e4fa] mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#adc6ff]">analytics</span>
+              <h2 className="font-display text-xl font-medium text-ink mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-accent">analytics</span>
                 Technical Analysis
               </h2>
               <div className="space-y-4">
                 {techBreakdown.map((item) => (
-                  <div key={item.label} className="p-3 bg-[#0d1c2d] rounded-lg">
+                  <div key={item.label} className="p-3 bg-surface-2 rounded-lg">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="font-mono text-[13px] text-[#d4e4fa]">{item.label}</span>
-                      <span className="font-mono text-[13px] text-[#adc6ff]">{item.score}%</span>
+                      <span className="font-mono text-[13px] text-ink">{item.label}</span>
+                      <span className="font-mono text-[13px] text-accent">{item.score}%</span>
                     </div>
-                    <div className="h-1.5 bg-white/10 rounded-full overflow-hidden mb-2">
-                      <div className="h-full bg-[#adc6ff] rounded-full" style={{ width: `${item.score}%` }} />
+                    <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden mb-2">
+                      <div className="h-full bg-accent rounded-full" style={{ width: `${item.score}%` }} />
                     </div>
-                    {item.note && <p className="font-sans text-xs text-[#c2c6d6]/60">{item.note}</p>}
+                    {item.note && <p className="font-sans text-xs text-ink-mute">{item.note}</p>}
                   </div>
                 ))}
               </div>
@@ -244,15 +244,15 @@ export default function HRCandidateReportPage({ params }: { params: Promise<{ id
 
           {/* Communication */}
           <div className="glass-panel rounded-xl p-6">
-            <h2 className="font-display text-xl font-medium text-[#d4e4fa] mb-4 flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#4edea3]">record_voice_over</span>
+            <h2 className="font-display text-xl font-medium text-ink mb-4 flex items-center gap-2">
+              <span className="material-symbols-outlined text-success">record_voice_over</span>
               Communication Analysis
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {commBreakdown.map((item) => (
-                <div key={item.label} className="text-center p-4 bg-[#0d1c2d] rounded-lg">
-                  <div className="font-display text-3xl font-bold text-[#4edea3] mb-1">{item.score}</div>
-                  <div className="font-mono text-[11px] text-[#c2c6d6]/60 uppercase">{item.label}</div>
+                <div key={item.label} className="text-center p-4 bg-surface-2 rounded-lg">
+                  <div className="font-display text-3xl font-bold text-success mb-1">{item.score}</div>
+                  <div className="font-mono text-[11px] text-ink-mute uppercase">{item.label}</div>
                 </div>
               ))}
             </div>
@@ -262,15 +262,15 @@ export default function HRCandidateReportPage({ params }: { params: Promise<{ id
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {e.strengths.length > 0 && (
               <div className="glass-panel rounded-xl p-6">
-                <h2 className="font-display text-xl font-medium text-[#d4e4fa] mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#4edea3]">verified</span>
+                <h2 className="font-display text-xl font-medium text-ink mb-4 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-success">verified</span>
                   Key Strengths
                 </h2>
                 <ul className="space-y-3">
                   {e.strengths.map((s, i) => (
                     <li key={i} className="flex gap-3">
-                      <span className="material-symbols-outlined text-[#4edea3] text-sm mt-0.5 flex-shrink-0">check_circle</span>
-                      <span className="font-sans text-sm text-[#c2c6d6] leading-relaxed">{s}</span>
+                      <span className="material-symbols-outlined text-success text-sm mt-0.5 flex-shrink-0">check_circle</span>
+                      <span className="font-sans text-sm text-ink-soft leading-relaxed">{s}</span>
                     </li>
                   ))}
                 </ul>
@@ -278,15 +278,15 @@ export default function HRCandidateReportPage({ params }: { params: Promise<{ id
             )}
             {e.improvements.length > 0 && (
               <div className="glass-panel rounded-xl p-6">
-                <h2 className="font-display text-xl font-medium text-[#d4e4fa] mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#adc6ff]">trending_up</span>
+                <h2 className="font-display text-xl font-medium text-ink mb-4 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-accent">trending_up</span>
                   Development Areas
                 </h2>
                 <ul className="space-y-3">
                   {e.improvements.map((s, i) => (
                     <li key={i} className="flex gap-3">
-                      <span className="material-symbols-outlined text-[#a4c9ff] text-sm mt-0.5 flex-shrink-0">arrow_forward</span>
-                      <span className="font-sans text-sm text-[#c2c6d6] leading-relaxed">{s}</span>
+                      <span className="material-symbols-outlined text-accent text-sm mt-0.5 flex-shrink-0">arrow_forward</span>
+                      <span className="font-sans text-sm text-ink-soft leading-relaxed">{s}</span>
                     </li>
                   ))}
                 </ul>
@@ -297,19 +297,19 @@ export default function HRCandidateReportPage({ params }: { params: Promise<{ id
           {/* Transcript */}
           {candidate.transcript.length > 0 && (
             <div className="glass-panel rounded-xl p-6">
-              <h2 className="font-display text-xl font-medium text-[#d4e4fa] mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#adc6ff]">forum</span>
+              <h2 className="font-display text-xl font-medium text-ink mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-accent">forum</span>
                 Interview Transcript
               </h2>
               <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar pr-2">
                 {candidate.transcript.map((line, i) => (
                   <div key={i} className="flex gap-4">
-                    <span className="font-mono text-[11px] text-[#c2c6d6]/40 mt-1 w-12 flex-shrink-0">{line.timestamp}</span>
-                    <div className={`flex-1 p-3 rounded-lg ${line.speaker === "Nova" ? "bg-[#adc6ff]/5 border border-[#adc6ff]/10" : "bg-[#273647]"}`}>
-                      <span className={`font-mono text-[11px] uppercase mb-1 block ${line.speaker === "Nova" ? "text-[#adc6ff]" : "text-[#4edea3]"}`}>
+                    <span className="font-mono text-[11px] text-ink-mute mt-1 w-12 flex-shrink-0">{line.timestamp}</span>
+                    <div className={`flex-1 p-3 rounded-lg ${line.speaker === "Nova" ? "bg-accent/5 border border-accent/10" : "bg-surface-2"}`}>
+                      <span className={`font-mono text-[11px] uppercase mb-1 block ${line.speaker === "Nova" ? "text-accent" : "text-success"}`}>
                         {line.speaker}
                       </span>
-                      <p className="font-sans text-sm text-[#c2c6d6] leading-relaxed">{line.text}</p>
+                      <p className="font-sans text-sm text-ink-soft leading-relaxed">{line.text}</p>
                     </div>
                   </div>
                 ))}
@@ -319,16 +319,16 @@ export default function HRCandidateReportPage({ params }: { params: Promise<{ id
 
           {/* Risks */}
           {e.riskFlags.length > 0 && (
-            <div className="glass-panel rounded-xl p-6 border border-[#ffb4ab]/10">
-              <h2 className="font-display text-xl font-medium text-[#d4e4fa] mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#ffb4ab]">warning</span>
+            <div className="glass-panel rounded-xl p-6 border border-danger/10">
+              <h2 className="font-display text-xl font-medium text-ink mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-danger">warning</span>
                 Risk Flags
               </h2>
               <ul className="space-y-3">
                 {e.riskFlags.map((risk, i) => (
-                  <li key={i} className="flex gap-3 p-3 bg-[#ffb4ab]/5 rounded-lg">
-                    <span className="material-symbols-outlined text-[#ffb4ab] text-sm mt-0.5 flex-shrink-0">error_outline</span>
-                    <span className="font-sans text-sm text-[#c2c6d6] leading-relaxed">{risk}</span>
+                  <li key={i} className="flex gap-3 p-3 bg-danger/5 rounded-lg">
+                    <span className="material-symbols-outlined text-danger text-sm mt-0.5 flex-shrink-0">error_outline</span>
+                    <span className="font-sans text-sm text-ink-soft leading-relaxed">{risk}</span>
                   </li>
                 ))}
               </ul>
@@ -337,16 +337,16 @@ export default function HRCandidateReportPage({ params }: { params: Promise<{ id
 
           {/* Next-round questions */}
           {e.nextRoundQuestions.length > 0 && (
-            <div className="glass-panel rounded-xl p-6 bg-[#adc6ff]/5 border border-[#adc6ff]/20">
-              <h2 className="font-display text-xl font-medium text-[#d4e4fa] mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#adc6ff]">quiz</span>
+            <div className="glass-panel rounded-xl p-6 bg-accent/5 border border-accent/20">
+              <h2 className="font-display text-xl font-medium text-ink mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-accent">quiz</span>
                 Suggested Next-Round Questions
               </h2>
               <ul className="space-y-3">
                 {e.nextRoundQuestions.map((q, i) => (
-                  <li key={i} className="flex gap-3 p-3 bg-[#0d1c2d] rounded-lg">
-                    <span className="font-mono text-[#adc6ff] text-sm font-bold flex-shrink-0">Q{i + 1}</span>
-                    <span className="font-sans text-sm text-[#c2c6d6] leading-relaxed">{q}</span>
+                  <li key={i} className="flex gap-3 p-3 bg-surface-2 rounded-lg">
+                    <span className="font-mono text-accent text-sm font-bold flex-shrink-0">Q{i + 1}</span>
+                    <span className="font-sans text-sm text-ink-soft leading-relaxed">{q}</span>
                   </li>
                 ))}
               </ul>
@@ -355,15 +355,15 @@ export default function HRCandidateReportPage({ params }: { params: Promise<{ id
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-4 pb-8">
-            <button className="px-6 py-3 bg-[#4edea3]/10 border border-[#4edea3]/20 text-[#4edea3] font-mono text-[13px] rounded-lg hover:bg-[#4edea3]/20 transition-all flex items-center gap-2">
+            <button className="px-6 py-3 bg-success/10 border border-success/20 text-success font-mono text-[13px] rounded-lg hover:bg-success/20 transition-all flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">thumb_up</span>
               Advance to Next Round
             </button>
-            <button className="px-6 py-3 bg-[#ffb4ab]/10 border border-[#ffb4ab]/20 text-[#ffb4ab] font-mono text-[13px] rounded-lg hover:bg-[#ffb4ab]/20 transition-all flex items-center gap-2">
+            <button className="px-6 py-3 bg-danger/10 border border-danger/20 text-danger font-mono text-[13px] rounded-lg hover:bg-danger/20 transition-all flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">thumb_down</span>
               Reject Candidate
             </button>
-            <button className="px-6 py-3 border border-white/10 hover:bg-white/5 text-[#d4e4fa] font-mono text-[13px] rounded-lg transition-all flex items-center gap-2 ml-auto">
+            <button className="px-6 py-3 border border-line hover:bg-surface-2-hover text-ink font-mono text-[13px] rounded-lg transition-all flex items-center gap-2 ml-auto">
               <span className="material-symbols-outlined text-sm">share</span>
               Share Report
             </button>

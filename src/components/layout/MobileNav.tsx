@@ -23,14 +23,14 @@ interface MobileNavProps {
 
 export function MobileNav({ items = defaultItems }: MobileNavProps) {
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-4 bg-[#1c2b3c]/90 backdrop-blur-lg border-t border-white/10 rounded-t-xl shadow-lg">
+    <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-4 bg-chrome border-t border-line rounded-t-xl shadow-lg">
       {items.map((item) => (
         <Link
           key={item.href}
           href={item.href}
           className={cn(
             "flex flex-col items-center gap-1 p-2 rounded-lg transition-all active:scale-90",
-            item.active ? "text-[#adc6ff] scale-110" : "text-[#c2c6d6] hover:text-[#adc6ff]"
+            item.active ? "text-accent scale-110" : "text-on-chrome/70 hover:text-on-chrome"
           )}
         >
           <span className={cn("material-symbols-outlined", item.active && "material-filled")}>

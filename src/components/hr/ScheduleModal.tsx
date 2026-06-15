@@ -78,39 +78,39 @@ export function ScheduleModal({ open, onClose, presetPositionId, onScheduled }: 
   }
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#010f1f]/70 backdrop-blur-sm p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={onClose}>
       <div className="glass-panel rounded-2xl w-full max-w-lg p-6 md:p-8" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="font-display text-xl font-semibold text-[#d4e4fa] flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#adc6ff]">event_available</span>
+          <h2 className="font-display text-xl font-semibold text-ink flex items-center gap-2">
+            <span className="material-symbols-outlined text-accent">event_available</span>
             Schedule Interview
           </h2>
-          <button onClick={onClose} className="text-[#c2c6d6] hover:text-[#d4e4fa]">
+          <button onClick={onClose} className="text-ink-soft hover:text-ink">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
 
         {link ? (
           <div className="space-y-5">
-            <div className="flex items-center gap-3 text-[#4edea3]">
+            <div className="flex items-center gap-3 text-success">
               <span className="material-symbols-outlined material-filled">check_circle</span>
               <span className="font-mono text-sm">Interview scheduled for {name}</span>
             </div>
-            <p className="font-sans text-sm text-[#c2c6d6]/80">
+            <p className="font-sans text-sm text-ink-mute">
               Share this link with the candidate. Nova will interview them on the{" "}
-              <span className="text-[#adc6ff]">{selected?.title}</span> skills.
+              <span className="text-accent">{selected?.title}</span> skills.
             </p>
-            <div className="flex items-center gap-2 bg-[#0d1c2d] border border-white/10 rounded-lg p-2">
-              <input readOnly value={link} className="flex-1 bg-transparent font-mono text-xs text-[#d4e4fa] outline-none px-2" />
-              <button onClick={copy} className="px-3 py-1.5 bg-[#adc6ff] text-[#002e6a] font-mono text-[11px] font-bold rounded-md">
+            <div className="flex items-center gap-2 bg-surface border border-line rounded-lg p-2">
+              <input readOnly value={link} className="flex-1 bg-transparent font-mono text-xs text-ink outline-none px-2" />
+              <button onClick={copy} className="px-3 py-1.5 bg-accent text-on-accent font-mono text-[11px] font-bold rounded-md">
                 {copied ? "Copied!" : "Copy"}
               </button>
             </div>
             <div className="flex gap-3 pt-2">
-              <a href={link} target="_blank" rel="noreferrer" className="flex-1 text-center px-4 py-2.5 bg-[#adc6ff] text-[#002e6a] font-mono text-[13px] font-bold rounded-lg hover:brightness-110 transition-all">
+              <a href={link} target="_blank" rel="noreferrer" className="flex-1 text-center px-4 py-2.5 bg-accent text-on-accent font-mono text-[13px] font-bold rounded-lg hover:bg-accent-hover transition-all">
                 Open Interview
               </a>
-              <button onClick={() => { setLink(null); setName(""); setEmail(""); }} className="flex-1 px-4 py-2.5 border border-white/10 text-[#d4e4fa] font-mono text-[13px] rounded-lg hover:bg-white/5 transition-all">
+              <button onClick={() => { setLink(null); setName(""); setEmail(""); }} className="flex-1 px-4 py-2.5 border border-line text-ink font-mono text-[13px] rounded-lg hover:bg-surface-2-hover transition-all">
                 Schedule Another
               </button>
             </div>
@@ -118,14 +118,14 @@ export function ScheduleModal({ open, onClose, presetPositionId, onScheduled }: 
         ) : (
           <div className="space-y-4">
             <div>
-              <label className="font-mono text-[11px] text-[#c2c6d6]/70 uppercase block mb-2">Position</label>
+              <label className="font-mono text-[11px] text-ink-mute uppercase block mb-2">Position</label>
               {positions.length === 0 ? (
-                <p className="font-sans text-sm text-[#ffb4ab]/80">No positions yet — create one on the Pools page first.</p>
+                <p className="font-sans text-sm text-danger/80">No positions yet — create one on the Pools page first.</p>
               ) : (
                 <select
                   value={positionId}
                   onChange={(e) => setPositionId(e.target.value)}
-                  className="w-full bg-[#0d1c2d] border border-white/10 rounded-lg py-2.5 px-3 text-sm focus:border-[#adc6ff] focus:outline-none"
+                  className="w-full bg-surface border border-line rounded-lg py-2.5 px-3 text-sm focus:border-accent focus:outline-none"
                 >
                   {positions.map((p) => (
                     <option key={p.id} value={p.id}>{p.title}</option>
@@ -135,34 +135,34 @@ export function ScheduleModal({ open, onClose, presetPositionId, onScheduled }: 
               {selected && (
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   {selected.requiredSkills.map((s) => (
-                    <span key={s} className="px-2 py-0.5 bg-[#adc6ff]/10 border border-[#adc6ff]/20 rounded font-mono text-[10px] text-[#adc6ff]">{s}</span>
+                    <span key={s} className="px-2 py-0.5 bg-accent/10 border border-accent/20 rounded font-mono text-[10px] text-accent">{s}</span>
                   ))}
                 </div>
               )}
             </div>
             <div>
-              <label className="font-mono text-[11px] text-[#c2c6d6]/70 uppercase block mb-2">Candidate Name</label>
+              <label className="font-mono text-[11px] text-ink-mute uppercase block mb-2">Candidate Name</label>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Jordan Rivera"
-                className="w-full bg-[#0d1c2d] border border-white/10 rounded-lg py-2.5 px-3 text-sm focus:border-[#adc6ff] focus:outline-none placeholder:text-[#c2c6d6]/30"
+                className="w-full bg-surface border border-line rounded-lg py-2.5 px-3 text-sm focus:border-accent focus:outline-none placeholder:text-ink-mute"
               />
             </div>
             <div>
-              <label className="font-mono text-[11px] text-[#c2c6d6]/70 uppercase block mb-2">Candidate Email <span className="text-[#c2c6d6]/30">(optional)</span></label>
+              <label className="font-mono text-[11px] text-ink-mute uppercase block mb-2">Candidate Email <span className="text-ink-mute">(optional)</span></label>
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="candidate@example.com"
-                className="w-full bg-[#0d1c2d] border border-white/10 rounded-lg py-2.5 px-3 text-sm focus:border-[#adc6ff] focus:outline-none placeholder:text-[#c2c6d6]/30"
+                className="w-full bg-surface border border-line rounded-lg py-2.5 px-3 text-sm focus:border-accent focus:outline-none placeholder:text-ink-mute"
               />
             </div>
-            {error && <p className="font-sans text-sm text-[#ffb4ab]">{error}</p>}
+            {error && <p className="font-sans text-sm text-danger">{error}</p>}
             <button
               onClick={submit}
               disabled={submitting || positions.length === 0}
-              className="w-full px-4 py-3 bg-[#adc6ff] text-[#002e6a] font-mono text-[13px] font-bold rounded-lg hover:brightness-110 transition-all disabled:opacity-40 flex items-center justify-center gap-2"
+              className="w-full px-4 py-3 bg-accent text-on-accent font-mono text-[13px] font-bold rounded-lg hover:bg-accent-hover transition-all disabled:opacity-40 flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <><span className="material-symbols-outlined text-sm animate-spin">progress_activity</span> Scheduling…</>
