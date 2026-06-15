@@ -33,8 +33,10 @@ export default function LiveInterviewRoomPage({ params }: { params: Promise<{ id
 
   // Candidate camera feed.
   useEffect(() => {
+    // Video only — the mic is left free for speech recognition / the Whisper
+    // recorder. Holding an active audio track here blocks webkitSpeechRecognition.
     navigator.mediaDevices
-      .getUserMedia({ video: true, audio: { echoCancellation: true, noiseSuppression: true } })
+      .getUserMedia({ video: true })
       .then((stream) => {
         streamRef.current = stream;
         if (videoRef.current) videoRef.current.srcObject = stream;
@@ -85,7 +87,7 @@ export default function LiveInterviewRoomPage({ params }: { params: Promise<{ id
       {/* Top Bar */}
       <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 md:px-12 h-16 bg-canvas/80 backdrop-blur-xl border-b border-line shadow-sm">
         <div className="flex items-center gap-6">
-          <h1 className="font-display text-xl font-bold text-accent tracking-tight">AIEval Pro</h1>
+          <h1 className="font-display text-xl font-bold text-accent tracking-tight">LayerForge</h1>
           <div className="h-6 w-px bg-surface-2" />
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
@@ -278,8 +280,9 @@ export default function LiveInterviewRoomPage({ params }: { params: Promise<{ id
         </div>
       </footer>
 
-      {/* Typed-answer fallback (no Web Speech API) */}
-      {listening && !session.voiceSupported && (
+      {/* Typed-answer input — always available during listening as a guaranteed
+          path (works regardless of mic/speech-recognition state). */}
+      {listening && (
         <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
           <div className="glass-panel rounded-xl p-3 flex items-center gap-3">
             <input

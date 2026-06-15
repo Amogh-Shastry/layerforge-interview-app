@@ -73,6 +73,7 @@ export function useInterviewSession(interviewId: string): InterviewSession {
   const [error] = useState<string | null>(null);
   const [micEnabled, setMicEnabledState] = useState(true);
   const [scripted, setScripted] = useState(false);
+  const [mediaRecorderSupported, setMediaRecorderSupported] = useState(false);
 
   const messagesRef = useRef<ChatMessage[]>([]);
   const endedRef = useRef(false);
@@ -88,6 +89,12 @@ export function useInterviewSession(interviewId: string): InterviewSession {
   // next chunk prefetched while the current one plays for near-gapless audio.
   const speechQueueRef = useRef<string[]>([]);
   const queueActiveRef = useRef(false);
+
+  // Whisper (/api/stt) fallback recorder — used when the browser has no Web Speech API.
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const recorderChunksRef = useRef<Blob[]>([]);
+  const recorderStreamRef = useRef<MediaStream | null>(null);
+  const mediaRecorderSupportedRef = useRef(false);
 
   const setPhaseSafe = useCallback((p: SessionPhase) => {
     phaseRef.current = p;
@@ -307,14 +314,95 @@ export function useInterviewSession(interviewId: string): InterviewSession {
     silenceMs: 1800,
   });
 
+  // Detect MediaRecorder + getUserMedia for the Whisper fallback path.
+  useEffect(() => {
+    const ok =
+      typeof window !== "undefined" &&
+      typeof MediaRecorder !== "undefined" &&
+      typeof navigator !== "undefined" &&
+      !!navigator.mediaDevices?.getUserMedia;
+    mediaRecorderSupportedRef.current = ok;
+    setMediaRecorderSupported(ok);
+  }, []);
+
+  const startWhisperCapture = useCallback(async () => {
+    try {
+      if (!recorderStreamRef.current) {
+        recorderStreamRef.current = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true },
+        });
+      }
+      const mime = MediaRecorder.isTypeSupported("audio/webm")
+        ? "audio/webm"
+        : MediaRecorder.isTypeSupported("audio/mp4")
+        ? "audio/mp4"
+        : "";
+      const rec = mime
+        ? new MediaRecorder(recorderStreamRef.current, { mimeType: mime })
+        : new MediaRecorder(recorderStreamRef.current);
+      recorderChunksRef.current = [];
+      rec.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) recorderChunksRef.current.push(e.data);
+      };
+      recorderRef.current = rec;
+      rec.start();
+    } catch {
+      /* mic unavailable — typed input remains the fallback */
+    }
+  }, []);
+
+  const stopWhisperAndTranscribe = useCallback(async (): Promise<string> => {
+    const rec = recorderRef.current;
+    if (!rec) return "";
+    const mime = rec.mimeType || "audio/webm";
+    const done = new Promise<void>((resolve) => {
+      rec.onstop = () => resolve();
+    });
+    try {
+      rec.stop();
+    } catch {
+      /* noop */
+    }
+    await done;
+    recorderRef.current = null;
+    const chunks = recorderChunksRef.current;
+    recorderChunksRef.current = [];
+    if (!chunks.length) return "";
+    const ext = mime.includes("mp4") ? "mp4" : mime.includes("ogg") ? "ogg" : "webm";
+    const blob = new Blob(chunks, { type: mime });
+    const form = new FormData();
+    form.append("audio", blob, `answer.${ext}`);
+    try {
+      const res = await fetch("/api/stt", { method: "POST", body: form });
+      if (!res.ok) return "";
+      const data = await res.json();
+      return typeof data.text === "string" ? data.text.trim() : "";
+    } catch {
+      return "";
+    }
+  }, []);
+
+  const stopRecorder = useCallback(() => {
+    try {
+      recorderRef.current?.stop();
+    } catch {
+      /* noop */
+    }
+    recorderRef.current = null;
+    recorderChunksRef.current = [];
+  }, []);
+
   const startListening = useCallback(() => {
     if (endedRef.current) return;
     setPhaseSafe("listening");
     setInterim("");
-    if (micEnabledRef.current && recognition.supported) {
+    if (!micEnabledRef.current) return;
+    if (recognition.supported) {
       recognition.start();
+    } else if (mediaRecorderSupportedRef.current) {
+      void startWhisperCapture();
     }
-  }, [recognition, setPhaseSafe]);
+  }, [recognition, setPhaseSafe, startWhisperCapture]);
 
   useEffect(() => {
     startListeningRef.current = startListening;
@@ -339,12 +427,25 @@ export function useInterviewSession(interviewId: string): InterviewSession {
 
   const stopAndSubmit = useCallback(() => {
     if (phaseRef.current !== "listening") return;
-    if (recognition.listening) {
-      recognition.stop();
-    } else if (interim.trim()) {
-      handleUtterance(interim);
+    if (recognition.supported) {
+      if (recognition.listening) {
+        recognition.stop();
+      } else if (interim.trim()) {
+        handleUtterance(interim);
+      }
+      return;
     }
-  }, [recognition, interim, handleUtterance]);
+    // Whisper fallback: stop recording, transcribe, then submit.
+    if (recorderRef.current) {
+      setPhaseSafe("thinking");
+      void (async () => {
+        const text = await stopWhisperAndTranscribe();
+        if (endedRef.current) return;
+        if (text) handleUtterance(text);
+        else startListeningRef.current();
+      })();
+    }
+  }, [recognition, interim, handleUtterance, setPhaseSafe, stopWhisperAndTranscribe]);
 
   const submitText = useCallback(
     (text: string) => {
@@ -361,12 +462,14 @@ export function useInterviewSession(interviewId: string): InterviewSession {
       setMicEnabledState(on);
       if (!on) {
         recognition.cancel();
+        stopRecorder();
         setInterim("");
-      } else if (phaseRef.current === "listening" && recognition.supported) {
-        recognition.start();
+      } else if (phaseRef.current === "listening") {
+        if (recognition.supported) recognition.start();
+        else if (mediaRecorderSupportedRef.current) void startWhisperCapture();
       }
     },
-    [recognition]
+    [recognition, stopRecorder, startWhisperCapture]
   );
 
   const end = useCallback((): TurnLine[] => {
@@ -374,6 +477,13 @@ export function useInterviewSession(interviewId: string): InterviewSession {
     setPhaseSafe("ended");
     speechQueueRef.current = [];
     recognition.cancel();
+    stopRecorder();
+    try {
+      recorderStreamRef.current?.getTracks().forEach((t) => t.stop());
+    } catch {
+      /* noop */
+    }
+    recorderStreamRef.current = null;
     try {
       audioRef.current?.pause();
     } catch {
@@ -383,7 +493,7 @@ export function useInterviewSession(interviewId: string): InterviewSession {
       window.speechSynthesis.cancel();
     }
     return transcript;
-  }, [recognition, transcript, setPhaseSafe]);
+  }, [recognition, transcript, setPhaseSafe, stopRecorder]);
 
   useEffect(() => {
     return () => {
@@ -401,7 +511,7 @@ export function useInterviewSession(interviewId: string): InterviewSession {
     interim,
     elapsed,
     error,
-    voiceSupported: recognition.supported,
+    voiceSupported: recognition.supported || mediaRecorderSupported,
     micEnabled,
     scripted,
     begin,
