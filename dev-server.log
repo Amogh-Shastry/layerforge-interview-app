@@ -1,0 +1,44 @@
+
+> interview-platform@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.56.1:3000
+- Environments: .env
+✓ Ready in 1128ms
+- Experiments (use with caution):
+  · serverActions
+
+ GET /interview/start/pos-senior-python 200 in 2.4s (next.js: 2.1s, application-code: 385ms)
+(node:67744) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+prisma:query SELECT "public"."Job"."id", "public"."Job"."title", "public"."Job"."description", "public"."Job"."organizationId", "public"."Job"."companyIntro", "public"."Job"."requirements", "public"."Job"."expectations", "public"."Job"."requiredSkills", "public"."Job"."softSkills", "public"."Job"."customQuestions", "public"."Job"."experienceMin", "public"."Job"."experienceMax", "public"."Job"."isActive", "public"."Job"."createdAt", "public"."Job"."updatedAt" FROM "public"."Job" WHERE ("public"."Job"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."Application"."id", "public"."Application"."candidateId", "public"."Application"."jobId", "public"."Application"."status"::text, "public"."Application"."coverLetter", "public"."Application"."createdAt", "public"."Application"."updatedAt" FROM "public"."Application" WHERE "public"."Application"."jobId" = $1 OFFSET $2
+prisma:query SELECT "public"."Interview"."id", "public"."Interview"."applicationId", "public"."Interview"."type"::text, "public"."Interview"."status"::text, "public"."Interview"."scheduledAt", "public"."Interview"."startedAt", "public"."Interview"."completedAt", "public"."Interview"."durationSeconds", "public"."Interview"."maxAttempts", "public"."Interview"."attemptNumber", "public"."Interview"."roomId", "public"."Interview"."createdAt", "public"."Interview"."updatedAt" FROM "public"."Interview" WHERE "public"."Interview"."applicationId" IN (NULL) OFFSET $1
+prisma:query SELECT "public"."Evaluation"."id", "public"."Evaluation"."interviewId", "public"."Evaluation"."technical", "public"."Evaluation"."communication", "public"."Evaluation"."leadership", "public"."Evaluation"."problemSolving", "public"."Evaluation"."teamwork", "public"."Evaluation"."cultureFit", "public"."Evaluation"."confidence", "public"."Evaluation"."overallScore", "public"."Evaluation"."recommendation"::text, "public"."Evaluation"."summary", "public"."Evaluation"."strengths", "public"."Evaluation"."improvements", "public"."Evaluation"."missingSkills", "public"."Evaluation"."riskFlags", "public"."Evaluation"."rawAnalysis", "public"."Evaluation"."createdAt", "public"."Evaluation"."updatedAt" FROM "public"."Evaluation" WHERE "public"."Evaluation"."interviewId" IN (NULL) OFFSET $1
+ GET /api/positions/pos-senior-python 200 in 3.9s (next.js: 1389ms, application-code: 2.5s)
+ GET / 200 in 196ms (next.js: 49ms, application-code: 147ms)
+ GET / 200 in 64ms (next.js: 6ms, application-code: 57ms)
+ GET /dashboard 200 in 183ms (next.js: 42ms, application-code: 141ms)
+ GET /dashboard/live 200 in 194ms (next.js: 46ms, application-code: 148ms)
+ GET /dashboard/evaluation 200 in 150ms (next.js: 40ms, application-code: 110ms)
+ GET /dashboard/pools 200 in 111ms (next.js: 35ms, application-code: 76ms)
+ GET /dashboard/reports 200 in 113ms (next.js: 40ms, application-code: 73ms)
+ GET /interview/start/pos-senior-python 200 in 98ms (next.js: 19ms, application-code: 79ms)
+ GET /interview/start/pos-devops 200 in 86ms (next.js: 5ms, application-code: 81ms)
+ GET /interview/demo 200 in 1036ms (next.js: 872ms, application-code: 163ms)
+ GET /interview/demo/screen-share 200 in 994ms (next.js: 929ms, application-code: 65ms)
+ GET /interview/demo/device-setup 200 in 871ms (next.js: 805ms, application-code: 66ms)
+ GET /interview/demo/ready 200 in 987ms (next.js: 900ms, application-code: 87ms)
+ GET /interview/demo/room 200 in 866ms (next.js: 763ms, application-code: 103ms)
+ GET /interview/demo/processing 200 in 1113ms (next.js: 1050ms, application-code: 62ms)
+ GET /interview/demo/complete 200 in 859ms (next.js: 774ms, application-code: 86ms)
+ GET /interview/demo/report 200 in 872ms (next.js: 806ms, application-code: 66ms)

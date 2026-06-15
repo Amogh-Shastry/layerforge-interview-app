@@ -1,0 +1,267 @@
+// AIEval Pro — Production Prisma Schema
+// Synthesized Intelligence Interview System
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  CANDIDATE
+  HR
+  ADMIN
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  FAILED
+}
+
+enum InterviewType {
+  HR_ROUND
+  TECHNICAL
+  BEHAVIORAL
+  SITUATIONAL
+  CODING
+}
+
+enum Recommendation {
+  STRONG_HIRE
+  HIRE
+  BORDERLINE
+  NO_HIRE
+}
+
+enum ApplicationStatus {
+  APPLIED
+  SCREENING
+  INTERVIEW_SCHEDULED
+  INTERVIEW_COMPLETED
+  OFFER_EXTENDED
+  HIRED
+  REJECTED
+}
+
+// ─── Core models ─────────────────────────────────────────────────────────────
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  logoUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+  jobs  Job[]
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String
+  role           UserRole @default(CANDIDATE)
+  avatarUrl      String?
+  organizationId String?
+  hashedPassword String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  candidates   Candidate[]
+  sessions     Session[]
+
+  @@index([email])
+  @@index([organizationId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+model Job {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  organizationId  String
+  companyIntro    String?  // about the company, shared by Nova at the start
+  requirements    String?  // free-text role requirements
+  expectations    String?  // what success looks like in the role
+  requiredSkills  String[] // ["Python", "FastAPI", "Docker"]
+  softSkills      String[] // ["Leadership", "Communication"]
+  customQuestions String[] // HR-authored questions Nova must ask
+  experienceMin   Int      @default(0)
+  experienceMax   Int?
+  isActive        Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id])
+  applications Application[]
+
+  @@index([organizationId])
+  @@index([isActive])
+}
+
+model Candidate {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  resumeUrl   String?
+  linkedinUrl String?
+  githubUrl   String?
+  phone       String?
+  location    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications Application[]
+
+  @@index([userId])
+}
+
+model Application {
+  id          String            @id @default(cuid())
+  candidateId String
+  jobId       String
+  status      ApplicationStatus @default(APPLIED)
+  coverLetter String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  candidate  Candidate   @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  job        Job         @relation(fields: [jobId], references: [id])
+  interviews Interview[]
+
+  @@unique([candidateId, jobId])
+  @@index([candidateId])
+  @@index([jobId])
+}
+
+// ─── Interview ────────────────────────────────────────────────────────────────
+
+model Interview {
+  id              String          @id @default(cuid())
+  applicationId   String
+  type            InterviewType   @default(TECHNICAL)
+  status          InterviewStatus @default(SCHEDULED)
+  scheduledAt     DateTime?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  durationSeconds Int?
+  maxAttempts     Int             @default(5)
+  attemptNumber   Int             @default(1)
+  roomId          String?         @unique // LiveKit room ID
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  application       Application        @relation(fields: [applicationId], references: [id])
+  messages          Message[]
+  evaluation        Evaluation?
+  report            Report?
+  suspiciousEvents  SuspiciousEvent[]
+
+  @@index([applicationId])
+  @@index([status])
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  interviewId String
+  role        String   // "assistant" | "user" | "system"
+  content     String
+  audioUrl    String?  // stored TTS/STT audio reference
+  timestamp   DateTime @default(now())
+
+  interview Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+
+  @@index([interviewId])
+}
+
+// ─── AI Evaluation ────────────────────────────────────────────────────────────
+
+model Evaluation {
+  id          String          @id @default(cuid())
+  interviewId String          @unique
+
+  // Core scores (0-100)
+  technical      Int @default(0)
+  communication  Int @default(0)
+  leadership     Int @default(0)
+  problemSolving Int @default(0)
+  teamwork       Int @default(0)
+  cultureFit     Int @default(0)
+  confidence     Int @default(0)
+  overallScore   Int @default(0)
+
+  recommendation Recommendation?
+  summary        String?          // AI-generated summary
+  strengths      String[]
+  improvements   String[]
+  missingSkills  String[]
+  riskFlags      String[]
+  rawAnalysis    Json?            // Full GPT response
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  interview Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+}
+
+// ─── Report ───────────────────────────────────────────────────────────────────
+
+model Report {
+  id          String  @id @default(cuid())
+  interviewId String  @unique
+
+  hrReportUrl        String? // S3 URL for HR PDF
+  candidateReportUrl String? // S3 URL for candidate PDF
+  hrEmailSentAt      DateTime?
+  candidateEmailSentAt DateTime?
+
+  // Suggested next round questions
+  nextRoundQuestions String[]
+  learningRoadmap    Json? // [{title, source, url}]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  interview Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+}
+
+// ─── Anti-cheat ───────────────────────────────────────────────────────────────
+
+model SuspiciousEvent {
+  id          String   @id @default(cuid())
+  interviewId String
+  type        String   // "TAB_SWITCH" | "WINDOW_BLUR" | "MULTIPLE_FACE" | "LONG_SILENCE" | "COPY_PASTE"
+  severity    String   @default("LOW") // "LOW" | "MEDIUM" | "HIGH"
+  description String?
+  metadata    Json?
+  timestamp   DateTime @default(now())
+
+  interview Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+
+  @@index([interviewId])
+  @@index([type])
+}

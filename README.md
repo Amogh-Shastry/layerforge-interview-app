@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AIEval Pro — AI Interview Automation Platform
 
-## Getting Started
+A production-grade AI interview platform built for DeepStation. Candidates take a
+fully voice-driven interview with **Nova**, an AI interviewer powered by GPT-4o,
+and HR reviews scored, evidence-backed reports.
 
-First, run the development server:
+## What works
+
+**Candidate flow** (`/interview/demo`):
+Landing → Screen-share check → Device setup → Ready → **Live voice room** →
+Processing → Complete → Personalized report.
+
+- **Real two-way voice.** Nova speaks each question aloud (OpenAI TTS, "nova" voice)
+  and listens to spoken answers (Chrome's Web Speech API), with automatic
+  turn-taking on natural pauses. A "Done Answering" button gives manual control.
+- **Adaptive questioning.** GPT-4o drives the conversation, probing based on prior
+  answers — the full transcript is the model's context each turn.
+- **Real evaluation.** On completion the transcript is scored across seven
+  dimensions and turned into strengths, gaps, risk flags, a learning roadmap, and
+  a hire recommendation.
+
+**HR dashboard** (`/dashboard`):
+Live candidate roster with scores, AI recommendations, and search. Click any
+candidate for the full report — competency scores, technical/communication
+breakdowns, transcript, risk flags, and suggested next-round questions.
+
+## Graceful degradation
+
+The app is built to run in any environment:
+
+| Capability         | With config                  | Without config (fallback)                     |
+| ------------------ | ---------------------------- | --------------------------------------------- |
+| AI questions       | GPT-4o (`OPENAI_API_KEY`)    | Scripted question bank                        |
+| Nova's voice       | OpenAI TTS                   | Browser `speechSynthesis`                     |
+| Listening          | Web Speech API (Chrome/Edge) | Type-to-answer input                          |
+| Data / persistence | Postgres (`DATABASE_URL`)    | Curated in-memory demo dataset (8 candidates) |
+
+The UI is always fully populated and the interview always runs — a missing
+database or API key degrades gracefully instead of breaking.
+
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+# .env already contains working DATABASE_URL + OPENAI_API_KEY
+npm run dev                 # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `OPENAI_API_KEY` — **required for real voice/AI.** Without it the app uses the
+  scripted + browser-speech fallback.
+- `DATABASE_URL` — Postgres connection string. Without it, the demo dataset is
+  served and live interviews run but aren't persisted.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Enabling database persistence
 
-## Learn More
+With a real `DATABASE_URL` set, create the schema and seed it:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run db:generate     # generate Prisma client
+npm run db:push         # create tables (or: npm run db:migrate)
+npm run db:seed         # load the candidate dataset
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Once seeded, the dashboard and reports read live rows, and completed interviews
+persist (messages, evaluation, report).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tech
 
-## Deploy on Vercel
+Next.js 16 (App Router) · TypeScript · Tailwind v4 · Prisma + Postgres (pg
+adapter) · OpenAI (GPT-4o, Whisper, TTS) · Web Speech API.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Browser support
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Best in **Chrome or Edge** (Web Speech API for live transcription). Other browsers
+automatically fall back to a type-to-answer input. Use headphones to prevent
+Nova's voice from being picked up by the microphone.
