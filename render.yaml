@@ -11,7 +11,7 @@ services:
     plan: free
     buildCommand: npm install && npm run build
     startCommand: npm run start
-    healthCheckPath: /
+    healthCheckPath: /api/health
     autoDeploy: true
     envVars:
       # Neon Postgres pooled connection string (?sslmode=require)

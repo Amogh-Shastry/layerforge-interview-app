@@ -47,17 +47,28 @@ function isClosingStatement(text: string): boolean {
   );
 }
 
-// Split a (possibly partial) text into [completeSentences, remainder].
-function extractSentences(buffer: string): { sentences: string[]; rest: string } {
-  const sentences: string[] = [];
-  const regex = /[^.!?]+[.!?]+(\s|$)/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-  while ((match = regex.exec(buffer)) !== null) {
-    sentences.push(match[0].trim());
-    lastIndex = regex.lastIndex;
+// Split a (possibly partial) text into speakable chunks + remainder. Breaks on
+// sentence enders, and also on a clause break (, ; : —) once the clause is long
+// enough — so Nova can start talking a clause sooner and pacing stays smooth,
+// without chopping up short phrases.
+function extractSpeakable(buffer: string): { chunks: string[]; rest: string } {
+  const chunks: string[] = [];
+  let start = 0;
+  for (let i = 0; i < buffer.length; i++) {
+    const ch = buffer[i];
+    const next = buffer[i + 1];
+    const atBoundary = next === undefined || /\s/.test(next);
+    if (!atBoundary) continue;
+    const seg = buffer.slice(start, i + 1).trim();
+    if (!seg) continue;
+    const isSentenceEnd = /[.!?]/.test(ch);
+    const isClause = /[,;:—–]/.test(ch) && seg.length >= 60;
+    if (isSentenceEnd || isClause) {
+      chunks.push(seg);
+      start = i + 1;
+    }
   }
-  return { sentences, rest: buffer.slice(lastIndex) };
+  return { chunks, rest: buffer.slice(start) };
 }
 
 export interface InterviewSession {
@@ -105,6 +116,8 @@ export function useInterviewSession(interviewId: string): InterviewSession {
   // next chunk prefetched while the current one plays for near-gapless audio.
   const speechQueueRef = useRef<string[]>([]);
   const queueActiveRef = useRef(false);
+  // Caption text revealed so far for the current Nova turn (kept in sync with audio).
+  const spokenRef = useRef("");
 
   // ── Voice capture (MediaRecorder → /api/stt Whisper, with silence auto-submit) ──
   const voiceSupportedRef = useRef(false);
@@ -125,85 +138,105 @@ export function useInterviewSession(interviewId: string): InterviewSession {
     setTranscript((prev) => [...prev, { speaker, text, timestamp: fmt(elapsedRef.current) }]);
   }, []);
 
-  // Synthesize one chunk → returns a player function that resolves when done.
-  const synthesize = useCallback(async (text: string): Promise<() => Promise<void>> => {
-    if (!text.trim()) return async () => {};
-    try {
-      const res = await fetch("/api/tts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
-      if (res.ok) {
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        return () =>
+  // Reveal a spoken chunk in the caption, in sync with its audio starting.
+  const revealCaption = useCallback((text: string) => {
+    if (endedRef.current) return;
+    spokenRef.current = spokenRef.current ? `${spokenRef.current} ${text}` : text;
+    setAiCaption(spokenRef.current);
+  }, []);
+
+  // Synthesize one chunk → returns { text, play } where play() resolves when done.
+  const synthesize = useCallback(
+    async (text: string): Promise<{ text: string; play: () => Promise<void> }> => {
+      if (!text.trim()) return { text, play: async () => {} };
+      try {
+        const res = await fetch("/api/tts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text }),
+        });
+        if (res.ok) {
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          return {
+            text,
+            play: () =>
+              new Promise<void>((resolve) => {
+                if (endedRef.current) return resolve();
+                const audio = new Audio(url);
+                audioRef.current = audio;
+                audio.onended = () => {
+                  URL.revokeObjectURL(url);
+                  resolve();
+                };
+                audio.onerror = () => {
+                  URL.revokeObjectURL(url);
+                  resolve();
+                };
+                audio.play().catch(() => resolve());
+              }),
+          };
+        }
+      } catch {
+        /* fall through */
+      }
+      // Browser speechSynthesis fallback.
+      return {
+        text,
+        play: () =>
           new Promise<void>((resolve) => {
             if (endedRef.current) return resolve();
-            const audio = new Audio(url);
-            audioRef.current = audio;
-            audio.onended = () => {
-              URL.revokeObjectURL(url);
-              resolve();
-            };
-            audio.onerror = () => {
-              URL.revokeObjectURL(url);
-              resolve();
-            };
-            audio.play().catch(() => resolve());
-          });
-      }
-    } catch {
-      /* fall through */
-    }
-    // Browser speechSynthesis fallback.
-    return () =>
-      new Promise<void>((resolve) => {
-        if (endedRef.current) return resolve();
-        if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-          return setTimeout(resolve, Math.min(6000, 500 + text.length * 45));
-        }
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.rate = 1.04;
-        utter.pitch = 1.05;
-        const voices = window.speechSynthesis.getVoices();
-        const preferred =
-          voices.find((v) => /female|samantha|jenny|aria|zira/i.test(v.name)) ??
-          voices.find((v) => v.lang?.startsWith("en"));
-        if (preferred) utter.voice = preferred;
-        utter.onend = () => resolve();
-        utter.onerror = () => resolve();
-        window.speechSynthesis.speak(utter);
-      });
-  }, []);
+            if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+              return setTimeout(resolve, Math.min(6000, 400 + text.length * 40));
+            }
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.rate = 1.04;
+            utter.pitch = 1.05;
+            const voices = window.speechSynthesis.getVoices();
+            const preferred =
+              voices.find((v) => /female|samantha|jenny|aria|zira/i.test(v.name)) ??
+              voices.find((v) => v.lang?.startsWith("en"));
+            if (preferred) utter.voice = preferred;
+            utter.onend = () => resolve();
+            utter.onerror = () => resolve();
+            window.speechSynthesis.speak(utter);
+          }),
+      };
+    },
+    []
+  );
 
   const processQueue = useCallback(async () => {
     if (queueActiveRef.current) return;
     queueActiveRef.current = true;
     if (!endedRef.current) setPhaseSafe("speaking");
 
-    let prefetch: Promise<() => Promise<void>> | null = null;
+    let prefetch: Promise<{ text: string; play: () => Promise<void> }> | null = null;
     while (!endedRef.current) {
-      let player: (() => Promise<void>) | null = null;
+      let item: { text: string; play: () => Promise<void> } | null = null;
       if (prefetch) {
-        player = await prefetch;
+        item = await prefetch;
         prefetch = null;
       } else if (speechQueueRef.current.length) {
-        player = await synthesize(speechQueueRef.current.shift()!);
+        item = await synthesize(speechQueueRef.current.shift()!);
       } else {
         break;
       }
+      // Prefetch the next chunk's audio while this one plays (gapless).
       if (speechQueueRef.current.length) {
         prefetch = synthesize(speechQueueRef.current.shift()!);
       }
-      await player();
+      // Caption is revealed exactly when this chunk's audio starts → in sync.
+      revealCaption(item.text);
+      await item.play();
     }
     if (prefetch && !endedRef.current) {
       const p = await prefetch;
-      await p();
+      revealCaption(p.text);
+      await p.play();
     }
     queueActiveRef.current = false;
-  }, [synthesize, setPhaseSafe]);
+  }, [synthesize, setPhaseSafe, revealCaption]);
 
   const enqueueSpeech = useCallback(
     (text: string) => {
@@ -232,8 +265,7 @@ export function useInterviewSession(interviewId: string): InterviewSession {
     async (start: boolean): Promise<string> => {
       if (scriptedRef.current) {
         const text = start ? SCRIPTED_INTRO : SCRIPTED_QUESTIONS[scriptIdxRef.current++ % SCRIPTED_QUESTIONS.length];
-        setAiCaption(text);
-        extractSentences(text + " ").sentences.forEach(enqueueSpeech);
+        extractSpeakable(text + " ").chunks.forEach(enqueueSpeech);
         return text;
       }
 
@@ -248,8 +280,7 @@ export function useInterviewSession(interviewId: string): InterviewSession {
           scriptedRef.current = true;
           setScripted(true);
           const text = start ? SCRIPTED_INTRO : SCRIPTED_QUESTIONS[scriptIdxRef.current++ % SCRIPTED_QUESTIONS.length];
-          setAiCaption(text);
-          extractSentences(text + " ").sentences.forEach(enqueueSpeech);
+          extractSpeakable(text + " ").chunks.forEach(enqueueSpeech);
           return text;
         }
 
@@ -257,17 +288,15 @@ export function useInterviewSession(interviewId: string): InterviewSession {
         const decoder = new TextDecoder();
         let full = "";
         let buffer = "";
-        setAiCaption("");
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
           const chunk = decoder.decode(value, { stream: true });
           full += chunk;
           buffer += chunk;
-          if (!endedRef.current) setAiCaption(full);
-          const { sentences, rest } = extractSentences(buffer);
-          if (sentences.length) {
-            sentences.forEach(enqueueSpeech);
+          const { chunks, rest } = extractSpeakable(buffer);
+          if (chunks.length) {
+            chunks.forEach(enqueueSpeech);
             buffer = rest;
           }
         }
@@ -278,8 +307,7 @@ export function useInterviewSession(interviewId: string): InterviewSession {
         scriptedRef.current = true;
         setScripted(true);
         const text = start ? SCRIPTED_INTRO : SCRIPTED_QUESTIONS[scriptIdxRef.current++ % SCRIPTED_QUESTIONS.length];
-        setAiCaption(text);
-        extractSentences(text + " ").sentences.forEach(enqueueSpeech);
+        extractSpeakable(text + " ").chunks.forEach(enqueueSpeech);
         return text;
       }
     },
@@ -293,13 +321,14 @@ export function useInterviewSession(interviewId: string): InterviewSession {
       if (endedRef.current) return;
       setPhaseSafe(start ? "connecting" : "thinking");
       setInterim("");
+      spokenRef.current = "";
+      setAiCaption("");
 
       const text = await generateReply(start);
       if (endedRef.current) return;
 
       messagesRef.current.push({ role: "assistant", content: text });
       pushTurn("Nova", text);
-      setAiCaption(text);
 
       await waitForSpeechDrain();
       if (endedRef.current) return;
