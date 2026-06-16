@@ -57,8 +57,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const ctx = await getInterviewContext(id);
     const result = await evaluateInterview(transcript, ctx.job.title, ctx.job.requiredSkills);
 
-    // Best-effort persistence — never blocks the response.
-    void persistEvaluation(id, result);
+    // Best-effort persistence (internally guarded) — awaited so it completes
+    // before the client may trigger a demo reset.
+    await persistEvaluation(id, result);
 
     return NextResponse.json({ result });
   } catch (error) {

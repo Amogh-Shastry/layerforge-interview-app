@@ -71,6 +71,15 @@ export default function ProcessingPage({ params }: { params: Promise<{ id: strin
         }
       }
 
+      // Demo reset — clean slate for the next interview. The candidate's own
+      // report still renders from sessionStorage. No-op unless the server has
+      // DEMO_RESET_ENABLED=true, so this is safe to always call.
+      try {
+        await fetch(`/api/admin/reset`, { method: "POST" });
+      } catch {
+        /* ignore */
+      }
+
       if (!cancelled) doneRef.current = true;
     }
 

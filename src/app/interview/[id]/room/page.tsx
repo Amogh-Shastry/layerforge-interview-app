@@ -82,6 +82,17 @@ export default function LiveInterviewRoomPage({ params }: { params: Promise<{ id
     router.push(`/interview/${id}/processing`);
   }, [session, id, router]);
 
+  // Auto-end once Nova has delivered the closing remarks — brief pause first so
+  // the candidate hears the goodbye before the report screen takes over.
+  const autoEndedRef = useRef(false);
+  useEffect(() => {
+    if (session.complete && started && !autoEndedRef.current) {
+      autoEndedRef.current = true;
+      const t = setTimeout(() => endInterview(), 1800);
+      return () => clearTimeout(t);
+    }
+  }, [session.complete, started, endInterview]);
+
   return (
     <div className="bg-canvas text-ink h-screen flex flex-col overflow-hidden selection:bg-accent/30">
       {/* Top Bar */}

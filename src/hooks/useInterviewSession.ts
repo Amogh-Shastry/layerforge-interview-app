@@ -33,6 +33,20 @@ function fmt(totalSeconds: number): string {
   return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 }
 
+// Detect Nova's closing remarks so the meeting can auto-end. The interview
+// system prompt has Nova thank the candidate and say the interview is complete
+// and the report will be shared — these phrases are specific to that close.
+function isClosingStatement(text: string): boolean {
+  const t = text.toLowerCase();
+  return (
+    /\binterview is (now |all )?(complete|completed|over|finished|concluded|done)\b/.test(t) ||
+    /\b(this|that) (concludes|wraps up|brings us to the end of|is the end of)\b/.test(t) ||
+    /\breport will be (shared|sent|provided|passed)\b/.test(t) ||
+    /\b(shared?|sent) (it )?(with|to) (the|our) (hiring|recruit|interview)/.test(t) ||
+    /\bwe'?ll be in touch\b/.test(t)
+  );
+}
+
 // Split a (possibly partial) text into [completeSentences, remainder].
 function extractSentences(buffer: string): { sentences: string[]; rest: string } {
   const sentences: string[] = [];
@@ -56,6 +70,8 @@ export interface InterviewSession {
   voiceSupported: boolean;
   micEnabled: boolean;
   scripted: boolean;
+  /** True once Nova has delivered the closing remarks — the meeting can auto-end. */
+  complete: boolean;
   begin: () => void;
   stopAndSubmit: () => void;
   submitText: (text: string) => void;
@@ -73,6 +89,7 @@ export function useInterviewSession(interviewId: string): InterviewSession {
   const [micEnabled, setMicEnabledState] = useState(true);
   const [scripted, setScripted] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(false);
+  const [complete, setComplete] = useState(false);
 
   const messagesRef = useRef<ChatMessage[]>([]);
   const endedRef = useRef(false);
@@ -286,6 +303,13 @@ export function useInterviewSession(interviewId: string): InterviewSession {
 
       await waitForSpeechDrain();
       if (endedRef.current) return;
+
+      // If Nova just delivered the closing remarks, end the meeting instead of
+      // listening for another answer. (Never on the opening turn.)
+      if (!start && messagesRef.current.length >= 4 && isClosingStatement(text)) {
+        setComplete(true);
+        return;
+      }
 
       startListeningRef.current();
     },
@@ -580,6 +604,7 @@ export function useInterviewSession(interviewId: string): InterviewSession {
     voiceSupported,
     micEnabled,
     scripted,
+    complete,
     begin,
     stopAndSubmit,
     submitText,
