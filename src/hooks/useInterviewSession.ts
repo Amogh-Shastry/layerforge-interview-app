@@ -145,65 +145,79 @@ export function useInterviewSession(interviewId: string): InterviewSession {
     setAiCaption(spokenRef.current);
   }, []);
 
-  // Synthesize one chunk → returns { text, play } where play() resolves when done.
+  // Speak a chunk with the browser's on-device synthesizer — instant, no
+  // network, no cold start.
+  const speakBrowser = useCallback((text: string): Promise<void> => {
+    return new Promise<void>((resolve) => {
+      if (endedRef.current) return resolve();
+      if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+        setTimeout(resolve, Math.min(5000, 350 + text.length * 35));
+        return;
+      }
+      try {
+        window.speechSynthesis.resume();
+      } catch {
+        /* noop */
+      }
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 1.05;
+      u.pitch = 1.05;
+      const voices = window.speechSynthesis.getVoices();
+      const preferred =
+        voices.find((v) => /natural|female|samantha|jenny|aria|zira/i.test(v.name)) ??
+        voices.find((v) => v.lang?.toLowerCase().startsWith("en"));
+      if (preferred) u.voice = preferred;
+      u.onend = () => resolve();
+      u.onerror = () => resolve();
+      window.speechSynthesis.speak(u);
+    });
+  }, []);
+
+  // Synthesize one chunk → returns { text, play }. Default voice is the instant
+  // on-device synthesizer. Set NEXT_PUBLIC_USE_OPENAI_TTS=true to use OpenAI TTS
+  // (higher quality, but a network round-trip per chunk).
   const synthesize = useCallback(
     async (text: string): Promise<{ text: string; play: () => Promise<void> }> => {
-      if (!text.trim()) return { text, play: async () => {} };
-      try {
-        const res = await fetch("/api/tts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text }),
-        });
-        if (res.ok) {
-          const blob = await res.blob();
-          const url = URL.createObjectURL(blob);
-          return {
-            text,
-            play: () =>
-              new Promise<void>((resolve) => {
-                if (endedRef.current) return resolve();
-                const audio = new Audio(url);
-                audioRef.current = audio;
-                audio.onended = () => {
-                  URL.revokeObjectURL(url);
-                  resolve();
-                };
-                audio.onerror = () => {
-                  URL.revokeObjectURL(url);
-                  resolve();
-                };
-                audio.play().catch(() => resolve());
-              }),
-          };
+      const t = text.trim();
+      if (!t) return { text, play: async () => {} };
+
+      if (process.env.NEXT_PUBLIC_USE_OPENAI_TTS === "true") {
+        try {
+          const res = await fetch("/api/tts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: t }),
+          });
+          if (res.ok) {
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            return {
+              text,
+              play: () =>
+                new Promise<void>((resolve) => {
+                  if (endedRef.current) return resolve();
+                  const audio = new Audio(url);
+                  audioRef.current = audio;
+                  audio.onended = () => {
+                    URL.revokeObjectURL(url);
+                    resolve();
+                  };
+                  audio.onerror = () => {
+                    URL.revokeObjectURL(url);
+                    resolve();
+                  };
+                  audio.play().catch(() => resolve());
+                }),
+            };
+          }
+        } catch {
+          /* fall back to browser speech */
         }
-      } catch {
-        /* fall through */
       }
-      // Browser speechSynthesis fallback.
-      return {
-        text,
-        play: () =>
-          new Promise<void>((resolve) => {
-            if (endedRef.current) return resolve();
-            if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-              return setTimeout(resolve, Math.min(6000, 400 + text.length * 40));
-            }
-            const utter = new SpeechSynthesisUtterance(text);
-            utter.rate = 1.04;
-            utter.pitch = 1.05;
-            const voices = window.speechSynthesis.getVoices();
-            const preferred =
-              voices.find((v) => /female|samantha|jenny|aria|zira/i.test(v.name)) ??
-              voices.find((v) => v.lang?.startsWith("en"));
-            if (preferred) utter.voice = preferred;
-            utter.onend = () => resolve();
-            utter.onerror = () => resolve();
-            window.speechSynthesis.speak(utter);
-          }),
-      };
+
+      return { text, play: () => speakBrowser(t) };
     },
-    []
+    [speakBrowser]
   );
 
   const processQueue = useCallback(async () => {
@@ -270,11 +284,15 @@ export function useInterviewSession(interviewId: string): InterviewSession {
       }
 
       try {
+        // Don't let a cold/slow API hang the interview — fall back to scripted.
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 25000);
         const res = await fetch(`/api/interviews/${interviewId}/chat`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ messages: messagesRef.current, start }),
-        });
+          signal: controller.signal,
+        }).finally(() => clearTimeout(timeout));
 
         if (!res.ok || !res.body) {
           scriptedRef.current = true;
@@ -540,6 +558,15 @@ export function useInterviewSession(interviewId: string): InterviewSession {
   useEffect(() => {
     startListeningRef.current = startListening;
   }, [startListening]);
+
+  // Warm up the speech-synthesis voice list (it loads asynchronously).
+  useEffect(() => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    window.speechSynthesis.getVoices();
+    const onVoices = () => window.speechSynthesis.getVoices();
+    window.speechSynthesis.addEventListener?.("voiceschanged", onVoices);
+    return () => window.speechSynthesis.removeEventListener?.("voiceschanged", onVoices);
+  }, []);
 
   // Elapsed timer.
   useEffect(() => {
