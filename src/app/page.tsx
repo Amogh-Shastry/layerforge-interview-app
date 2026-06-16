@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Logo } from "@/components/ui/Logo";
 
 export default function Home() {
   const router = useRouter();
@@ -45,12 +44,15 @@ export default function Home() {
       </div>
 
       <div className="glass-panel rounded-xl p-8 max-w-md w-full space-y-6">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <Logo variant="mono" tagline />
-          <div>
-            <h1 className="font-display text-2xl font-bold text-ink tracking-tight">HR Sign In</h1>
-            <p className="text-ink-mute text-sm mt-1">Sign in to access the hiring dashboard</p>
-          </div>
+        {/* Brand logo — full-colour lockup on a light plate so the teal reads
+            on the dark page. File lives at public/layerforge-logo.png */}
+        <div className="bg-black/40 backdrop-blur-md border border-white/10 shadow-lg rounded-2xl px-8 py-7 flex items-center justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/layerforge-logo.png"
+            alt="LayerForge — Built with Precision"
+            className="w-full max-w-[320px] h-auto"
+          />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

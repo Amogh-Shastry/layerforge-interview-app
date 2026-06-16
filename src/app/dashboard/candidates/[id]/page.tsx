@@ -117,7 +117,7 @@ export default function HRCandidateReportPage({ params }: { params: Promise<{ id
       : [];
 
   return (
-    <div className="bg-canvas text-ink min-h-screen custom-scrollbar">
+    <div className="dashboard-fonts bg-canvas text-ink min-h-screen custom-scrollbar">
       <header className="sticky top-0 z-50 flex justify-between items-center px-6 md:px-12 h-16 bg-canvas/80 backdrop-blur-xl border-b border-line">
         <div className="flex items-center gap-4">
           <Link href="/dashboard" className="text-ink-soft hover:text-accent transition-colors">

@@ -1,5 +1,42 @@
-@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 @import "tailwindcss";
+
+/* Lufga — self-hosted (dashboard headings). See public/fonts/lufga/. */
+@font-face {
+  font-family: "Lufga";
+  src: url("/fonts/lufga/Lufga-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Lufga";
+  src: url("/fonts/lufga/Lufga-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Lufga";
+  src: url("/fonts/lufga/Lufga-SemiBold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Lufga";
+  src: url("/fonts/lufga/Lufga-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Lufga";
+  src: url("/fonts/lufga/Lufga-ExtraBold.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* ============================================================
    LayerForge design tokens — see design.md
@@ -208,6 +245,16 @@ body {
 
 ::selection {
   background-color: var(--selection-bg);
+}
+
+/* Dashboard typography: Lufga for headings/titles, Outfit for body (the default).
+   The logo sets its own font inline, so it stays Urbanist. */
+.dashboard-fonts :where(h1, h2, h3, h4, h5, h6),
+.dashboard-fonts .font-display,
+.dashboard-fonts .font-display-lg,
+.dashboard-fonts .font-headline-lg,
+.dashboard-fonts .font-headline-md {
+  font-family: "Lufga", "Urbanist", sans-serif;
 }
 
 /* Glassmorphism panel — teal-tinted, lighter blur, less glow */
