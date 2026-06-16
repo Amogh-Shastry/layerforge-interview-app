@@ -51,6 +51,9 @@
   --color-surface-2-hover: var(--surface-2-hover);
   --color-chrome: var(--chrome);
   --color-on-chrome: var(--on-chrome);
+  --color-chrome-soft: var(--chrome-soft);
+  --color-chrome-soft-hover: var(--chrome-soft-hover);
+  --color-chrome-line: var(--chrome-line);
   --color-ink: var(--text-primary);
   --color-ink-soft: var(--text-secondary);
   --color-ink-mute: var(--text-muted);
@@ -171,6 +174,9 @@
   --surface-2-hover: #38516b;
   --chrome: #033b55;
   --on-chrome: #f5f4f0;
+  --chrome-soft: rgba(255, 255, 255, 0.05);
+  --chrome-soft-hover: rgba(255, 255, 255, 0.09);
+  --chrome-line: rgba(255, 255, 255, 0.1);
 
   --text-primary: #f5f4f0;
   --text-secondary: #c3cdd6;
@@ -207,8 +213,11 @@
   --surface-2: #eceae3;
   --surface-1-hover: #f3f2ee;
   --surface-2-hover: #e3e1d9;
-  --chrome: #033b55; /* teal chrome in both themes */
-  --on-chrome: #f5f4f0;
+  --chrome: #ffffff; /* light header/sidebar in light mode */
+  --on-chrome: #2c3e50;
+  --chrome-soft: rgba(3, 59, 85, 0.05);
+  --chrome-soft-hover: rgba(3, 59, 85, 0.09);
+  --chrome-line: rgba(44, 62, 80, 0.12);
 
   --text-primary: #16222e;
   --text-secondary: #2c3e50;
@@ -252,6 +261,20 @@ body {
    These two are the only text fonts used. */
 :where(h1, h2, h3, h4, h5, h6) {
   font-family: "Lufga", "Outfit", sans-serif;
+}
+
+/* Chrome logo: off-white lockup on the teal header (dark mode), full-colour
+   lockup on the light header (light mode). */
+.lf-chrome-light {
+  display: none;
+}
+:root.light .lf-chrome-light,
+.light .lf-chrome-light {
+  display: inline-flex;
+}
+:root.light .lf-chrome-dark,
+.light .lf-chrome-dark {
+  display: none;
 }
 
 /* Glassmorphism panel — teal-tinted, lighter blur, less glow */

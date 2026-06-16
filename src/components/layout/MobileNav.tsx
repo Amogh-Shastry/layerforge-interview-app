@@ -23,7 +23,7 @@ interface MobileNavProps {
 
 export function MobileNav({ items = defaultItems }: MobileNavProps) {
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-4 bg-chrome border-t border-line rounded-t-xl shadow-lg">
+    <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-4 bg-chrome border-t border-chrome-line rounded-t-xl shadow-lg">
       {items.map((item) => (
         <Link
           key={item.href}

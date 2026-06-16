@@ -49,7 +49,7 @@ export function ThemeToggle({ className, variant = "chrome" }: ThemeToggleProps)
       className={cn(
         "flex items-center justify-center h-9 w-9 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
         onChrome
-          ? "text-on-chrome/70 hover:text-on-chrome hover:bg-white/10"
+          ? "text-on-chrome/70 hover:text-on-chrome hover:bg-chrome-soft-hover"
           : "text-ink-mute hover:text-ink hover:bg-surface-2",
         className
       )}

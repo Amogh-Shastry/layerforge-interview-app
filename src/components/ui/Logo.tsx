@@ -24,7 +24,10 @@ export function Logo({ variant = "mono", tagline = false, className }: LogoProps
         {/* Full-stop stays white (matches the wordmark) — no orange. */}
         <span className={isFull ? "text-teal" : "text-on-chrome"}>.</span>
         <span
-          className="align-super text-[0.4em] font-bold opacity-70"
+          className={cn(
+            "align-super text-[0.4em] font-bold",
+            isFull ? "text-teal" : "text-on-chrome"
+          )}
           style={{ fontFamily: '"Poppins", sans-serif' }}
         >
           ™

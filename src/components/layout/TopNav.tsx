@@ -30,13 +30,14 @@ export function TopNav({
     <nav
       className={cn(
         "fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 md:px-12 h-16",
-        "bg-chrome border-b border-line shadow-sm",
+        "bg-chrome border-b border-chrome-line shadow-sm",
         className
       )}
     >
       <div className="flex items-center gap-8">
         <Link href="/" aria-label="LayerForge home">
-          <Logo variant="mono" />
+          <Logo variant="mono" className="lf-chrome-dark" />
+          <Logo variant="full" className="lf-chrome-light" />
         </Link>
         {!minimal && links.length > 0 && (
           <nav className="hidden md:flex gap-6">

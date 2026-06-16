@@ -37,9 +37,10 @@ export function HRShell({ title, subtitle, children, headerRight }: HRShellProps
   return (
     <div className="bg-canvas text-ink min-h-screen flex flex-col">
       {/* Header — teal chrome */}
-      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 md:px-12 h-16 bg-chrome border-b border-line shadow-sm">
+      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 md:px-12 h-16 bg-chrome border-b border-chrome-line shadow-sm">
         <Link href="/dashboard" aria-label="LayerForge home">
-          <Logo variant="mono" />
+          <Logo variant="mono" className="lf-chrome-dark" />
+          <Logo variant="full" className="lf-chrome-light" />
         </Link>
         <div className="flex-1 flex justify-center px-4">{headerRight}</div>
         <div className="flex items-center gap-3">
@@ -56,9 +57,9 @@ export function HRShell({ title, subtitle, children, headerRight }: HRShellProps
 
       <div className="flex flex-1 pt-16">
         {/* Sidebar — teal chrome */}
-        <aside className="hidden md:flex fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-chrome border-r border-line flex-col py-8 z-40">
+        <aside className="hidden md:flex fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-chrome border-r border-chrome-line flex-col py-8 z-40">
           <div className="px-6 mb-8">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-chrome-soft border border-chrome-line">
               <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center">
                 <span className="material-symbols-outlined text-on-accent">corporate_fare</span>
               </div>
@@ -77,7 +78,7 @@ export function HRShell({ title, subtitle, children, headerRight }: HRShellProps
                   key={item.label}
                   href={item.href}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-                    active ? "bg-accent/12 text-accent border-r-4 border-accent" : "text-on-chrome/70 hover:bg-white/5 hover:text-on-chrome"
+                    active ? "bg-accent/12 text-accent border-r-4 border-accent" : "text-on-chrome/70 hover:bg-chrome-soft hover:text-on-chrome"
                   }`}
                 >
                   <span className={`material-symbols-outlined text-xl ${active ? "material-filled" : ""}`}>{item.icon}</span>
@@ -106,7 +107,7 @@ export function HRShell({ title, subtitle, children, headerRight }: HRShellProps
       </div>
 
       {/* Mobile nav — teal chrome */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-2 bg-chrome border-t border-line">
+      <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-2 bg-chrome border-t border-chrome-line">
         {navItems.map((item) => {
           const active = isActive(item.href);
           return (

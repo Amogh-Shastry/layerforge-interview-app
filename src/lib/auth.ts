@@ -97,12 +97,16 @@ export async function verifySessionToken(
   }
 }
 
-/** Validate submitted HR credentials against the configured env values. */
+/** Validate submitted HR credentials. Username is case-insensitive (and trimmed);
+ *  the password is matched exactly. */
 export function verifyCredentials(username: string, password: string): boolean {
   const expectedUser = process.env.HR_USERNAME || "admin";
   const expectedPass = process.env.HR_PASSWORD || "layerforge";
   const enc = new TextEncoder();
-  const userOk = timingSafeEqual(enc.encode(username), enc.encode(expectedUser));
+  const userOk = timingSafeEqual(
+    enc.encode(username.trim().toLowerCase()),
+    enc.encode(expectedUser.trim().toLowerCase())
+  );
   const passOk = timingSafeEqual(enc.encode(password), enc.encode(expectedPass));
   return userOk && passOk;
 }

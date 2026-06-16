@@ -104,7 +104,7 @@ export default function Home() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-accent text-on-accent font-display font-bold rounded-lg hover:bg-accent-hover active:bg-accent-press transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="mx-auto flex items-center justify-center gap-2 px-8 py-2.5 bg-accent text-on-accent font-display font-bold rounded-lg hover:bg-accent-hover active:bg-accent-press transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="material-symbols-outlined text-lg animate-spin">progress_activity</span>
