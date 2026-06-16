@@ -12,8 +12,8 @@ interface LogoProps {
 export function Logo({ variant = "mono", tagline = false, className }: LogoProps) {
   const isFull = variant === "full";
   return (
-    // Logo always renders in Urbanist (brand mark) — set inline so it is immune
-    // to section font overrides like the dashboard's Lufga headings.
+    // Logo keeps its own brand font (Urbanist) — exempt from the app-wide
+    // Lufga/Outfit standard. Set inline so heading rules can't override it.
     <span
       className={cn("inline-flex flex-col leading-none select-none", className)}
       style={{ fontFamily: '"Urbanist", sans-serif' }}

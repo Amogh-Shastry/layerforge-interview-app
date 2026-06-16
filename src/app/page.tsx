@@ -43,21 +43,27 @@ export default function Home() {
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-accent/5 rounded-full blur-[100px]" />
       </div>
 
-      <div className="glass-panel rounded-xl p-8 max-w-md w-full space-y-6">
-        {/* Brand logo — full-colour lockup on a light plate so the teal reads
-            on the dark page. File lives at public/layerforge-logo.png */}
-        <div className="bg-black/40 backdrop-blur-md border border-white/10 shadow-lg rounded-2xl px-8 py-7 flex items-center justify-center">
+      <div className="bg-white rounded-2xl p-8 max-w-md w-full space-y-6 shadow-2xl border border-black/5">
+        {/* Brand logo — full-colour lockup directly on the white card.
+            The ™ is overlaid since the logo file doesn't include it. */}
+        <div className="relative w-full max-w-[320px] mx-auto pt-1">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/layerforge-logo.png"
-            alt="LayerForge — Built with Precision"
-            className="w-full max-w-[320px] h-auto"
+            alt="LayerForge™ — Built with Precision"
+            className="w-full h-auto"
           />
+          <span
+            className="absolute top-0 right-0 -translate-y-1/4 text-teal font-bold leading-none text-[13px]"
+            style={{ fontFamily: '"Poppins", sans-serif' }}
+          >
+            ™
+          </span>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label htmlFor="username" className="font-mono text-[11px] uppercase tracking-widest text-ink-mute">
+            <label htmlFor="username" className="font-sans text-[11px] uppercase tracking-widest text-[#5E7081]">
               Username
             </label>
             <input
@@ -67,13 +73,13 @@ export default function Home() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-surface-2 border border-line rounded-lg text-ink text-sm placeholder:text-ink-mute focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors"
+              className="w-full px-4 py-3 bg-[#F5F4F0] border border-[#8FA3B1]/40 rounded-lg text-[#16222E] text-sm placeholder:text-[#8FA3B1] focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-colors"
               placeholder="Enter your username"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="password" className="font-mono text-[11px] uppercase tracking-widest text-ink-mute">
+            <label htmlFor="password" className="font-sans text-[11px] uppercase tracking-widest text-[#5E7081]">
               Password
             </label>
             <input
@@ -83,7 +89,7 @@ export default function Home() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-surface-2 border border-line rounded-lg text-ink text-sm placeholder:text-ink-mute focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors"
+              className="w-full px-4 py-3 bg-[#F5F4F0] border border-[#8FA3B1]/40 rounded-lg text-[#16222E] text-sm placeholder:text-[#8FA3B1] focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-colors"
               placeholder="Enter your password"
             />
           </div>
@@ -98,7 +104,7 @@ export default function Home() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-accent text-on-accent font-mono font-bold rounded-lg hover:bg-accent-hover active:bg-accent-press transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full py-3 bg-accent text-on-accent font-display font-bold rounded-lg hover:bg-accent-hover active:bg-accent-press transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="material-symbols-outlined text-lg animate-spin">progress_activity</span>
@@ -109,14 +115,14 @@ export default function Home() {
           </button>
         </form>
 
-        <div className="flex items-center justify-center gap-4 opacity-40">
+        <div className="flex items-center justify-center gap-4 text-[#8FA3B1]">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">lock</span>
-            <span className="font-mono text-[11px] uppercase tracking-widest">E2E Encrypted</span>
+            <span className="font-sans text-[11px] uppercase tracking-widest">E2E Encrypted</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">auto_awesome</span>
-            <span className="font-mono text-[11px] uppercase tracking-widest">AI Moderated</span>
+            <span className="font-sans text-[11px] uppercase tracking-widest">AI Moderated</span>
           </div>
         </div>
       </div>

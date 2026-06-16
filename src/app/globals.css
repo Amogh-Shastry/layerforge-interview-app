@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Urbanist:wght@600;700;800&family=Poppins:wght@700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 @import "tailwindcss";
 
 /* Lufga — self-hosted (dashboard headings). See public/fonts/lufga/. */
@@ -104,17 +104,18 @@
   --color-on-error: var(--on-accent);
 
   /* --- Typography --- */
+  /* Lufga = headings/titles, Outfit = everything else. The only two fonts. */
   --font-sans: "Outfit", sans-serif;
-  --font-display: "Urbanist", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
-  --font-headline-lg: "Urbanist", sans-serif;
-  --font-headline-md: "Urbanist", sans-serif;
-  --font-display-lg: "Urbanist", sans-serif;
+  --font-display: "Lufga", "Outfit", sans-serif;
+  --font-mono: "Outfit", sans-serif;
+  --font-headline-lg: "Lufga", "Outfit", sans-serif;
+  --font-headline-md: "Lufga", "Outfit", sans-serif;
+  --font-display-lg: "Lufga", "Outfit", sans-serif;
   --font-body-sm: "Outfit", sans-serif;
   --font-body-md: "Outfit", sans-serif;
   --font-body-lg: "Outfit", sans-serif;
-  --font-label-sm: "JetBrains Mono", monospace;
-  --font-label-md: "JetBrains Mono", monospace;
+  --font-label-sm: "Outfit", sans-serif;
+  --font-label-md: "Outfit", sans-serif;
 
   --text-display-lg: 48px;
   --text-display-lg--line-height: 1.1;
@@ -247,14 +248,10 @@ body {
   background-color: var(--selection-bg);
 }
 
-/* Dashboard typography: Lufga for headings/titles, Outfit for body (the default).
-   The logo sets its own font inline, so it stays Urbanist. */
-.dashboard-fonts :where(h1, h2, h3, h4, h5, h6),
-.dashboard-fonts .font-display,
-.dashboard-fonts .font-display-lg,
-.dashboard-fonts .font-headline-lg,
-.dashboard-fonts .font-headline-md {
-  font-family: "Lufga", "Urbanist", sans-serif;
+/* App-wide typography standard: Lufga for all headings/titles, Outfit for body.
+   These two are the only text fonts used. */
+:where(h1, h2, h3, h4, h5, h6) {
+  font-family: "Lufga", "Outfit", sans-serif;
 }
 
 /* Glassmorphism panel — teal-tinted, lighter blur, less glow */
@@ -272,7 +269,7 @@ body {
 
 /* Status chip */
 .status-chip {
-  font-family: "JetBrains Mono", monospace;
+  font-family: "Outfit", sans-serif;
   text-transform: uppercase;
   font-size: 10px;
   letter-spacing: 0.05em;

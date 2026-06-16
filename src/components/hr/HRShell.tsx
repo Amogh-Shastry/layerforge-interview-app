@@ -35,7 +35,7 @@ export function HRShell({ title, subtitle, children, headerRight }: HRShellProps
   };
 
   return (
-    <div className="dashboard-fonts bg-canvas text-ink min-h-screen flex flex-col">
+    <div className="bg-canvas text-ink min-h-screen flex flex-col">
       {/* Header — teal chrome */}
       <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 md:px-12 h-16 bg-chrome border-b border-line shadow-sm">
         <Link href="/dashboard" aria-label="LayerForge home">
